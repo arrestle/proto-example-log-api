@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package shared;
+
+option go_package = "github.com/ansible/log-schema/gen/go/sharedpb";
+
+
+// Canonical set of structured attributes for job logging
+message LogAttributes {
+  string job_id = 1;
+  string work_unit_type = 2;
+  string org_id = 3;       // Optional
+  string controller_id = 4;
+  string username = 5;
+}
