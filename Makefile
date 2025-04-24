@@ -74,6 +74,12 @@ gen-python:
 	@echo "--running go example"
 	cd example/go && go mod tidy && go run main.go
 
+
+ run-otlp-example: go
+	@echo ""
+	@echo "--running go example"
+	cd example/go_otlp && go mod tidy && go run main.go
+
  run-py-example:
 	@echo ""
 	@echo "--running minimal library version"
@@ -119,5 +125,8 @@ help:
 	@echo "  run-all           Run go and python examples after make gen-all first"
 	@echo "    run-go-example    Run go example"
 	@echo "    run-py-example    Run python example"
+	@echo "  run-otlp-example  A go program showing how to embed LogAttributes within an OTEL LogRecord"
+	@echo "                    **note**: Above would normally be carried in a binary payload"
+	@echo "                    and processed by otel toolslike grafana and not designed to be human-readable."
 	@echo "  clean             Remove all generated code and tools, you will need to make gen-all again"
 	@echo "  help              Show this help message"

@@ -2,19 +2,28 @@
 
 This repo demonstrates a simple, dependency-light approach for sharing a `.proto` file that combines OpenTelemetry and Ansible-specific fields across Python and Go. It generates language-specific structs for structured (JSON) logging using standard `protoc` tooling.
 
-**Note:** This is a proof of concept. Logs are emitted as JSON (not binary OTLP), and no additional Python libraries are required.
+## Why are we doing this? Why do you care?
+
+While immediately relevant for structured logging, .proto will be even more impactful when backend correlation across services and Grafana-based visualization are in place. B By adopting Protobuf now, we will have a headstart towards tracing later, and eliminate the need to rework structured (JSON) logging later to accomodate otlp.
+
+
+**Note:** This is a minimal proof of concept. Logs are serialized as JSON rather than binary OTLP, and utilize only standard Python libraries.
 
 ## Proof of Concept Scope
+* Utilizes native protoc tooling without introducing extra dependencies, ensuring easy adoption across projects.
 
-- Uses native `protoc` with no extra dependencies
-- Generates Go and Python structs from a shared schema
-- Emits JSON logs for simplicity and inspection
-- Aligns with OpenTelemetry, extensible for Ansible use cases
+* Automatic generation of Go and Python structs from a shared Protobuf schema to promote consistency and maintainability.
+
+* Emits structured JSON logs for immediate usability, with a clear migration path toward binary OTLP formats.
+
+* Establishes alignment with OpenTelemetry standards, creating a foundation for future Ansible-specific extensions and end-to-end distributed tracing.
 
 ## Examples
 
 - [`example/go/main.go`](example/go/main.go): Minimal Go program using the generated struct
+- [`example/go_otlp/main.go`](example/go_otlp/main.go): OTLP Compliant Logging with embedded ansible-specific attributes.
 - [`example/py/main.py`](example/py/main.py): Minimal Python program using the generated class
+- [`example/py_google/main.py`](example/py_google/main.py): Same as above with Google MessageToDict library
 
 
 ## Getting Started / Makefile overview
@@ -35,11 +44,25 @@ go version  # go1.22.7 or similar
 # shows available targets to generate and run examples.
 make help   
 ```
-## Demo
-
+## Structured Logging Demo using .proto
+Note that every a single .proto file is used to generate both a go struct and a python class which result in the same log format for both languages. The tooling is initially complex to set up, but thereafter easily reproducible.
 ![Terminal demo of log-schema usage](demo.gif)
 
+
+## OTLP Demo using same log-schema .proto embedded into LogRecord.
+Note that this would normally have resources filled in by the otel collector and be sent to a grafana (or other otel) backend for display correlation and processing. This is not meant to be human readable.
+![Terminal demo of otlp LogRecord](demo2.gif)
+
 ## Future Work
+
+### Grafana demo with traces
+
+* Demonstrate how Controller and Receptor traces appear in OpenShift  [grafana dashboards](https://github.com/cloud-bulldozer/performance-dashboards/blob/master/dittybopper/README.md).
+
+* Walk through modifying the OpenTelemetry (OTEL) Collector to filter traces by user_id, node_id, and other key fields.
+
+* Showcase how to enrich trace data by adding resource attributes such as ip_address, pod, namespace, host_id, and more.
+
 
 ### Naming Conventions
 
@@ -58,7 +81,8 @@ make help
 - Reuse across repos once naming is resolved to promote consistency
 
 ### Containerize or other automation
-- For structured logging we can simply generate the go and python equivalents and check into github, later versions can be generated using pipelines to always regenerate when a PR is merged.
+- For structured logging we can simply generate the go and python equivalents and check that into github. 
+- Later versions can be generated in pipelines to always regenerate when a PR is merged.
 
 ## Background
 
