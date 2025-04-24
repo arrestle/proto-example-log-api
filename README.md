@@ -35,6 +35,9 @@ go version  # go1.22.7 or similar
 # shows available targets to generate and run examples.
 make help   
 ```
+## Demo
+
+![Terminal demo of log-schema usage](demo.gif)
 
 ## Future Work
 
