@@ -4,10 +4,12 @@ This repo demonstrates a simple, dependency-light approach for sharing a `.proto
 
 ## Why are we doing this? Why do you care?
 
-While immediately relevant for structured logging, .proto will be even more impactful when backend correlation across services and Grafana-based visualization are in place. B By adopting Protobuf now, we will have a headstart towards tracing later, and eliminate the need to rework structured (JSON) logging later to accomodate otlp.
+We agree that OTEL implementation is slotted for phase 2. We propose the use of Protobuf in phase 1 to allow us to generate identical JSON structures in both Python and Go as demonstrated in this repo.
+
+Protobuf generated data structures allow us to implement JSON structured logging now, and clarify the path forward to OTEL tracing in phase 2. We will also have the opportunity to socialize Protobuf with less complex .proto files before we tackle OTEL implementation.
 
 
-**Note:** This is a minimal proof of concept. Logs are serialized as JSON rather than binary OTLP, and utilize only standard Python libraries.
+**Note:** This is a minimal proof of concept. Logs are serialized as JSON rather than binary OTLP, and utilize only standard Python and Go libraries.
 
 ## Proof of Concept Scope
 * Utilizes native protoc tooling without introducing extra dependencies, ensuring easy adoption across projects.
