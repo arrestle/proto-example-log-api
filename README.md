@@ -1,4 +1,4 @@
-# Structured Logging Across Languages with Protobuf and OpenTelemetry
+# Structured Logging Across Languages with Protobuf
 
 This repo demonstrates a simple, dependency-light approach for sharing a `.proto` file that combines OpenTelemetry and Ansible-specific fields across Python and Go. It generates language-specific structs for structured (JSON) logging using standard `protoc` tooling.
 
