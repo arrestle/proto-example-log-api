@@ -1,0 +1,115 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "shared/gateway_user_api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1ListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total count of users matching the filter criteria (across all pages).\nExample: 42"
+        },
+        "next": {
+          "type": "string",
+          "title": "URL to the next page of results, or empty string if this is the last page.\nExample: \"/api/gateway/v1/users/?page=2\""
+        },
+        "previous": {
+          "type": "string",
+          "title": "URL to the previous page of results, or empty string if this is the first page.\nExample: \"\""
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1User"
+          },
+          "description": "Array of User objects for the current page."
+        }
+      },
+      "description": "ListUsersResponse contains a paginated list of users matching the query."
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Unique numeric identifier for the user. Auto-generated on creation.\nExample: 123"
+        },
+        "username": {
+          "type": "string",
+          "title": "Username for login and identification. Must be unique across all users.\nTypically lowercase alphanumeric with underscores or hyphens.\nExample: \"alice\" or \"bob_admin\""
+        },
+        "email": {
+          "type": "string",
+          "title": "Email address for the user. Used for notifications and password recovery.\nMust be a valid email format.\nExample: \"alice@example.com\""
+        },
+        "firstName": {
+          "type": "string",
+          "title": "User's first/given name for display purposes.\nExample: \"Alice\""
+        },
+        "lastName": {
+          "type": "string",
+          "title": "User's last/family name for display purposes.\nExample: \"Smith\""
+        },
+        "isSuperuser": {
+          "type": "boolean",
+          "title": "Whether this user has superuser privileges (all permissions).\nSuperusers can perform any action including user management and system configuration.\nExample: false (most users), true (system administrators)"
+        },
+        "created": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when the user account was created.\nRead-only, set automatically on creation.\nExample: \"2025-10-29T10:00:00Z\""
+        },
+        "modified": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when the user account was last modified.\nRead-only, updated automatically on any change.\nExample: \"2025-10-29T12:30:00Z\""
+        }
+      },
+      "description": "User represents an AAP Gateway user account.\n\nUsers are the primary authentication and authorization entities in AAP.\nEach user can be associated with multiple authenticators (LDAP, SAML, local, etc.)\nand can be granted permissions through role-based access control (RBAC)."
+    }
+  }
+}

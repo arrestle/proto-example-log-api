@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package aap.gateway.v1;
+
+option go_package = "github.com/ansible/log-schema/gen/go/gatewaypb";
+
+// UserService provides operations for managing AAP Gateway users.
+//
+// This service handles user account management including creation, retrieval,
+// and listing operations. All operations require appropriate authentication
+// and authorization via AAP Gateway's authentication system.
+service UserService {
+  // GetUser retrieves a single user account by their unique ID.
+  //
+  // Returns the complete user record including username, email, and role information.
+  // Requires authentication. Returns NOT_FOUND if user doesn't exist or caller
+  // lacks permission to view the user.
+  rpc GetUser(GetUserRequest) returns (User) {}
+  
+  // ListUsers retrieves a paginated list of users with optional filtering.
+  //
+  // Supports filtering by username, email, and search across multiple fields.
+  // Results are paginated with configurable page size. Requires authentication
+  // and returns only users visible to the caller based on RBAC permissions.
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
+  
+  // CreateUser creates a new user account in AAP Gateway.
+  //
+  // Creates a new user with the specified credentials and profile information.
+  // Requires superuser privileges. Username must be unique. Password must meet
+  // configured complexity requirements.
+  rpc CreateUser(CreateUserRequest) returns (User) {}
+}
+
+// User represents an AAP Gateway user account.
+//
+// Users are the primary authentication and authorization entities in AAP.
+// Each user can be associated with multiple authenticators (LDAP, SAML, local, etc.)
+// and can be granted permissions through role-based access control (RBAC).
+message User {
+  // Unique numeric identifier for the user. Auto-generated on creation.
+  // Example: 123
+  int32 id = 1;
+  
+  // Username for login and identification. Must be unique across all users.
+  // Typically lowercase alphanumeric with underscores or hyphens.
+  // Example: "alice" or "bob_admin"
+  string username = 2;
+  
+  // Email address for the user. Used for notifications and password recovery.
+  // Must be a valid email format.
+  // Example: "alice@example.com"
+  string email = 3;
+  
+  // User's first/given name for display purposes.
+  // Example: "Alice"
+  string first_name = 4;
+  
+  // User's last/family name for display purposes.
+  // Example: "Smith"
+  string last_name = 5;
+  
+  // Whether this user has superuser privileges (all permissions).
+  // Superusers can perform any action including user management and system configuration.
+  // Example: false (most users), true (system administrators)
+  bool is_superuser = 6;
+  
+  // ISO 8601 timestamp when the user account was created.
+  // Read-only, set automatically on creation.
+  // Example: "2025-10-29T10:00:00Z"
+  string created = 7;
+  
+  // ISO 8601 timestamp when the user account was last modified.
+  // Read-only, updated automatically on any change.
+  // Example: "2025-10-29T12:30:00Z"
+  string modified = 8;
+}
+
+// GetUserRequest specifies which user to retrieve by their unique ID.
+message GetUserRequest {
+  // Numeric user ID to retrieve. Must be a valid user ID that exists in the system.
+  // Example: 123
+  int32 id = 1;
+}
+
+// ListUsersRequest specifies pagination and filtering for user list queries.
+message ListUsersRequest {
+  // Page number for pagination, starting from 1.
+  // Example: 1 (first page), 2 (second page)
+  int32 page = 1;
+  
+  // Number of results per page. Default: 25, Maximum: 200.
+  // Example: 25
+  int32 page_size = 2;
+  
+  // Search string to filter users across username, first_name, last_name, and email fields.
+  // Case-insensitive partial matching.
+  // Example: "alice" matches "alice", "Alice Smith", "alice@example.com"
+  string search = 3;
+}
+
+// ListUsersResponse contains a paginated list of users matching the query.
+message ListUsersResponse {
+  // Total count of users matching the filter criteria (across all pages).
+  // Example: 42
+  int32 count = 1;
+  
+  // URL to the next page of results, or empty string if this is the last page.
+  // Example: "/api/gateway/v1/users/?page=2"
+  string next = 2;
+  
+  // URL to the previous page of results, or empty string if this is the first page.
+  // Example: ""
+  string previous = 3;
+  
+  // Array of User objects for the current page.
+  repeated User results = 4;
+}
+
+// CreateUserRequest specifies the required and optional fields for creating a new user account.
+message CreateUserRequest {
+  // Username for the new user. Must be unique and not already exist.
+  // Required. Example: "bob"
+  string username = 1;
+  
+  // Password for local authentication. Must meet configured complexity requirements.
+  // Required for local users. Example: "SecureP@ssw0rd123"
+  string password = 2;
+  
+  // Email address for the user. Used for notifications and account recovery.
+  // Optional. Example: "bob@example.com"
+  string email = 3;
+  
+  // First/given name for display.
+  // Optional. Example: "Bob"
+  string first_name = 4;
+  
+  // Last/family name for display.
+  // Optional. Example: "Johnson"
+  string last_name = 5;
+}
+
