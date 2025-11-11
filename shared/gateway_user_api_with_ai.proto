@@ -1,0 +1,409 @@
+syntax = "proto3";
+
+package aap.gateway.v1;
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/ansible/log-schema/gen/go/gatewaypb";
+
+// Configure the API info with AI-specific metadata
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "AAP Gateway User API";
+    version: "1.0.0";
+    description: "API for managing users in Ansible Automation Platform Gateway. Supports user creation, retrieval, and listing operations with RBAC-based access control.";
+    extensions: {
+      key: "x-ai-reasoning-instructions";
+      value {
+        string_value: "This API manages AAP user accounts. Users are the primary authentication entities. Always verify user permissions before operations. For searches, use the ListUsers endpoint with the search parameter for flexible matching across multiple fields.";
+      }
+    }
+    extensions: {
+      key: "x-ai-responding-instructions";
+      value {
+        string_value: "When returning user information, always include the username and id. Format lists clearly with count information. Explain RBAC restrictions if users cannot be accessed.";
+      }
+    }
+  };
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+};
+
+// UserService provides operations for managing AAP Gateway users.
+//
+// This service handles user account management including creation, retrieval,
+// and listing operations. All operations require appropriate authentication
+// and authorization via AAP Gateway's authentication system.
+service UserService {
+  // GetUser retrieves a single user account by their unique ID.
+  //
+  // Returns the complete user record including username, email, and role information.
+  // Requires authentication. Returns NOT_FOUND if user doesn't exist or caller
+  // lacks permission to view the user.
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Get user by ID";
+      description: "Retrieve a specific user account from AAP Gateway by their unique numeric identifier.";
+      tags: "Users";
+      extensions: {
+        key: "x-ai-reasoning-instructions";
+        value {
+          string_value: "Use this to get details about a specific AAP user when you know their numeric ID. Do not confuse user ID (integer like 123) with username (string like 'alice'). If user is not found, it may not exist or caller lacks permission.";
+        }
+      }
+      extensions: {
+        key: "x-ai-capabilities";
+        value {
+          string_value: "read-only-operation";
+        }
+      }
+      extensions: {
+        key: "x-openai-isConsequential";
+        value {
+          bool_value: false;
+        }
+      }
+      extensions: {
+        key: "x-aap-rbac-permission";
+        value {
+          string_value: "view_user";
+        }
+      }
+    };
+  }
+  
+  // ListUsers retrieves a paginated list of users with optional filtering.
+  //
+  // Supports filtering by username, email, and search across multiple fields.
+  // Results are paginated with configurable page size. Requires authentication
+  // and returns only users visible to the caller based on RBAC permissions.
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "List users with filtering";
+      description: "Retrieve a paginated list of AAP users. Supports flexible search across username, first name, last name, and email. Results are filtered based on caller's RBAC permissions.";
+      tags: "Users";
+      extensions: {
+        key: "x-ai-reasoning-instructions";
+        value {
+          string_value: "Use this to search for users or get a list of all users. The 'search' parameter does case-insensitive partial matching across username, first_name, last_name, and email - use it for flexible queries like 'find users with admin in their name'. Respect pagination - don't request more than 200 results per page.";
+        }
+      }
+      extensions: {
+        key: "x-ai-capabilities";
+        value {
+          string_value: "read-only-operation,supports-pagination,supports-search";
+        }
+      }
+      extensions: {
+        key: "x-openai-isConsequential";
+        value {
+          bool_value: false;
+        }
+      }
+      extensions: {
+        key: "x-aap-rbac-permission";
+        value {
+          string_value: "view_user";
+        }
+      }
+    };
+  }
+  
+  // CreateUser creates a new user account in AAP Gateway.
+  //
+  // Creates a new user with the specified credentials and profile information.
+  // Requires superuser privileges. Username must be unique. Password must meet
+  // configured complexity requirements.
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      summary: "Create a new user";
+      description: "Create a new user account in AAP Gateway. Requires superuser privileges. Username must be unique. Password must meet configured complexity requirements (length, digits, uppercase, special characters).";
+      tags: "Users";
+      extensions: {
+        key: "x-ai-reasoning-instructions";
+        value {
+          string_value: "Use this to create a new AAP user account. IMPORTANT: This requires superuser privileges - verify the caller has admin rights first. Usernames must be unique and passwords must meet security requirements. Common mistakes: trying to create with existing username, weak passwords, missing required fields.";
+        }
+      }
+      extensions: {
+        key: "x-ai-capabilities";
+        value {
+          string_value: "mutating-operation,requires-admin";
+        }
+      }
+      extensions: {
+        key: "x-openai-isConsequential";
+        value {
+          bool_value: true;
+        }
+      }
+      extensions: {
+        key: "x-ai-common-mistakes";
+        value {
+          string_value: "Don't forget password complexity requirements. Don't reuse existing usernames. Don't assume email is required (it's optional).";
+        }
+      }
+      extensions: {
+        key: "x-aap-rbac-permission";
+        value {
+          string_value: "add_user";
+        }
+      }
+    };
+  }
+}
+
+// User represents an AAP Gateway user account.
+//
+// Users are the primary authentication and authorization entities in AAP.
+// Each user can be associated with multiple authenticators (LDAP, SAML, local, etc.)
+// and can be granted permissions through role-based access control (RBAC).
+message User {
+  // Unique numeric identifier for the user. Auto-generated on creation.
+  // Example: 123
+  int32 id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Unique numeric identifier for the user. Auto-generated on creation.";
+    example: "123";
+    read_only: true;
+  }];
+  
+  // Username for login and identification. Must be unique across all users.
+  // Typically lowercase alphanumeric with underscores or hyphens.
+  // Example: "alice" or "bob_admin"
+  string username = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Username for login and identification. Must be unique across all users.";
+    example: "\"alice\"";
+    pattern: "^[a-z0-9_-]+$";
+    min_length: 1;
+    max_length: 150;
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "Usually lowercase letters, numbers, underscores, or hyphens. Examples: 'alice', 'bob_admin', 'user-123'";
+      }
+    }
+  }];
+  
+  // Email address for the user. Used for notifications and password recovery.
+  // Must be a valid email format.
+  // Example: "alice@example.com"
+  string email = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Email address for the user. Used for notifications and password recovery.";
+    example: "\"alice@example.com\"";
+    format: "email";
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "Must be valid email format like alice@example.com";
+      }
+    }
+  }];
+  
+  // User's first/given name for display purposes.
+  // Example: "Alice"
+  string first_name = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "User's first/given name for display purposes.";
+    example: "\"Alice\"";
+    max_length: 150;
+  }];
+  
+  // User's last/family name for display purposes.
+  // Example: "Smith"
+  string last_name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "User's last/family name for display purposes.";
+    example: "\"Smith\"";
+    max_length: 150;
+  }];
+  
+  // Whether this user has superuser privileges (all permissions).
+  // Superusers can perform any action including user management and system configuration.
+  // Example: false (most users), true (system administrators)
+  bool is_superuser = 6 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Whether this user has superuser privileges with all permissions.";
+    example: "false";
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "Superusers have unrestricted access. Most users should be false. Only set to true for system administrators.";
+      }
+    }
+    extensions: {
+      key: "x-ai-security-note";
+      value {
+        string_value: "Granting superuser privileges gives complete system access. Use with caution.";
+      }
+    }
+  }];
+  
+  // ISO 8601 timestamp when the user account was created.
+  // Read-only, set automatically on creation.
+  // Example: "2025-10-29T10:00:00Z"
+  string created = 7 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "ISO 8601 timestamp when the user account was created.";
+    example: "\"2025-10-29T10:00:00Z\"";
+    format: "date-time";
+    read_only: true;
+  }];
+  
+  // ISO 8601 timestamp when the user account was last modified.
+  // Read-only, updated automatically on any change.
+  // Example: "2025-10-29T12:30:00Z"
+  string modified = 8 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "ISO 8601 timestamp when the user account was last modified.";
+    example: "\"2025-10-29T12:30:00Z\"";
+    format: "date-time";
+    read_only: true;
+  }];
+}
+
+// GetUserRequest specifies which user to retrieve by their unique ID.
+message GetUserRequest {
+  // Numeric user ID to retrieve. Must be a valid user ID that exists in the system.
+  // Example: 123
+  int32 id = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Numeric user ID to retrieve. Must be a valid user ID that exists in the system.";
+    example: "123";
+    minimum: 1;
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "This is the numeric ID (like 123), not the username (like 'alice'). Get this from a previous ListUsers call or other source.";
+      }
+    }
+  }];
+}
+
+// ListUsersRequest specifies pagination and filtering for user list queries.
+message ListUsersRequest {
+  // Page number for pagination, starting from 1.
+  // Example: 1 (first page), 2 (second page)
+  int32 page = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Page number for pagination, starting from 1.";
+    example: "1";
+    default: "1";
+    minimum: 1;
+  }];
+  
+  // Number of results per page. Default: 25, Maximum: 200.
+  // Example: 25
+  int32 page_size = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Number of results per page.";
+    example: "25";
+    default: "25";
+    minimum: 1;
+    maximum: 200;
+  }];
+  
+  // Search string to filter users across username, first_name, last_name, and email fields.
+  // Case-insensitive partial matching.
+  // Example: "alice" matches "alice", "Alice Smith", "alice@example.com"
+  string search = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Search string to filter users across multiple fields (username, first_name, last_name, email). Case-insensitive partial matching.";
+    example: "\"alice\"";
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "This searches across username, first name, last name, and email with partial case-insensitive matching. 'alice' matches 'alice', 'Alice Smith', or 'alice@example.com'. Very flexible for finding users.";
+      }
+    }
+    extensions: {
+      key: "x-ai-usage-example";
+      value {
+        string_value: "To find all admins: search='admin'. To find user Alice: search='alice'. To find by email domain: search='@redhat.com'";
+      }
+    }
+  }];
+}
+
+// ListUsersResponse contains a paginated list of users matching the query.
+message ListUsersResponse {
+  // Total count of users matching the filter criteria (across all pages).
+  // Example: 42
+  int32 count = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Total count of users matching the filter criteria across all pages.";
+    example: "42";
+  }];
+  
+  // URL to the next page of results, or empty string if this is the last page.
+  // Example: "/api/gateway/v1/users/?page=2"
+  string next = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "URL to the next page of results, or empty string if this is the last page.";
+    example: "\"/api/gateway/v1/users/?page=2\"";
+  }];
+  
+  // URL to the previous page of results, or empty string if this is the first page.
+  // Example: ""
+  string previous = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "URL to the previous page of results, or empty string if this is the first page.";
+    example: "\"\"";
+  }];
+  
+  // Array of User objects for the current page.
+  repeated User results = 4;
+}
+
+// CreateUserRequest specifies the required and optional fields for creating a new user account.
+message CreateUserRequest {
+  // Username for the new user. Must be unique and not already exist.
+  // Required. Example: "bob"
+  string username = 1 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Username for the new user. Must be unique and not already exist.";
+    example: "\"bob\"";
+    pattern: "^[a-z0-9_-]+$";
+    min_length: 1;
+    max_length: 150;
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "Must be unique. Lowercase letters, numbers, underscores, hyphens only. Check with ListUsers first to avoid conflicts.";
+      }
+    }
+  }];
+  
+  // Password for local authentication. Must meet configured complexity requirements.
+  // Required for local users. Example: "SecureP@ssw0rd123"
+  string password = 2 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Password for local authentication. Must meet configured complexity requirements (minimum length, digits, uppercase, special characters).";
+    example: "\"SecureP@ssw0rd123\"";
+    format: "password";
+    min_length: 8;
+    extensions: {
+      key: "x-ai-hint";
+      value {
+        string_value: "Password must meet AAP security requirements: typically 8+ characters with mix of uppercase, lowercase, numbers, and special characters. Never log or display passwords.";
+      }
+    }
+    extensions: {
+      key: "x-ai-security-note";
+      value {
+        string_value: "CRITICAL: This is sensitive data. Never return password values in responses. Always transmit over HTTPS only.";
+      }
+    }
+  }];
+  
+  // Email address for the user. Used for notifications and account recovery.
+  // Optional. Example: "bob@example.com"
+  string email = 3 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "Email address for the user. Used for notifications and account recovery.";
+    example: "\"bob@example.com\"";
+    format: "email";
+  }];
+  
+  // First/given name for display.
+  // Optional. Example: "Bob"
+  string first_name = 4 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "User's first/given name for display purposes.";
+    example: "\"Bob\"";
+    max_length: 150;
+  }];
+  
+  // Last/family name for display.
+  // Optional. Example: "Johnson"
+  string last_name = 5 [(grpc.gateway.protoc_gen_openapiv2.options.openapiv2_field) = {
+    description: "User's last/family name for display purposes.";
+    example: "\"Johnson\"";
+    max_length: 150;
+  }];
+}
+

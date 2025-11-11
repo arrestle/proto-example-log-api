@@ -1,0 +1,245 @@
+syntax = "proto3";
+
+package awx.controller.v1;
+
+option go_package = "github.com/ansible/proto-example-log-api/gen/go/awxpb";
+
+// JobTemplateService provides operations for managing AWX/Controller job templates.
+//
+// Job templates are reusable definitions for running Ansible playbooks against
+// inventories. They are the primary automation execution mechanism in AWX/Controller.
+// All operations require appropriate RBAC permissions.
+service JobTemplateService {
+  // GetJobTemplate retrieves a single job template by ID.
+  //
+  // Returns the complete job template configuration including project, inventory,
+  // and playbook settings. Requires 'view' permission on the job template.
+  rpc GetJobTemplate(GetJobTemplateRequest) returns (JobTemplate) {}
+  
+  // ListJobTemplates retrieves a paginated list of job templates.
+  //
+  // Returns only job templates the caller has permission to view based on RBAC.
+  // Supports filtering by name, organization, and search across multiple fields.
+  rpc ListJobTemplates(ListJobTemplatesRequest) returns (ListJobTemplatesResponse) {}
+  
+  // LaunchJobTemplate launches a job from the template.
+  //
+  // Creates a new job instance and queues it for execution. This is the primary
+  // way to run automation in AWX/Controller. Requires 'execute' permission.
+  // Returns immediately with the created job - use job status API to monitor progress.
+  rpc LaunchJobTemplate(LaunchJobTemplateRequest) returns (Job) {}
+}
+
+// JobTemplate represents a reusable definition for running Ansible playbooks.
+//
+// Job templates combine a project (source code), inventory (target hosts),
+// credentials (access), and playbook into a reusable automation definition.
+// They are the core abstraction for automation execution in AWX/Controller.
+message JobTemplate {
+  // Unique identifier for the job template.
+  // Example: 7
+  int32 id = 1;
+  
+  // Human-readable name for the template.
+  // Must be unique within the organization.
+  // Example: "Deploy Web Servers"
+  string name = 2;
+  
+  // Optional description explaining the template's purpose.
+  // Example: "Deploys Apache web servers to production"
+  string description = 3;
+  
+  // Type of job to run: "run" (normal execution) or "check" (dry-run mode).
+  // Example: "run"
+  string job_type = 4;
+  
+  // ID of the project containing the playbook source code.
+  // Example: 5
+  int32 project_id = 5;
+  
+  // ID of the inventory defining target hosts.
+  // Example: 3
+  int32 inventory_id = 6;
+  
+  // Name of the playbook file within the project to execute.
+  // Example: "site.yml" or "playbooks/deploy.yml"
+  string playbook = 7;
+  
+  // Organization that owns this job template.
+  // Example: 1
+  int32 organization_id = 8;
+  
+  // Current status of the job template.
+  // Values: "never updated", "ok", "successful", "failed", "error", "cancelled"
+  // Based on the most recent job execution.
+  // Example: "successful"
+  string status = 9;
+  
+  // ISO 8601 timestamp when created.
+  // Example: "2025-01-15T10:00:00Z"
+  string created = 10;
+  
+  // ISO 8601 timestamp when last modified.
+  // Example: "2025-10-29T14:30:00Z"
+  string modified = 11;
+  
+  // Ansible verbosity level (0-5).
+  // 0=normal, 1=-v, 2=-vv, 3=-vvv, 4=-vvvv, 5=-vvvvv
+  // Example: 0
+  int32 verbosity = 12;
+  
+  // Number of parallel processes (--forks).
+  // 0 means use Ansible default.
+  // Example: 0
+  int32 forks = 13;
+  
+  // Job timeout in seconds. 0 means no timeout.
+  // Example: 0
+  int32 timeout = 14;
+  
+  // Pattern of hosts to target (--limit).
+  // Empty means all inventory hosts.
+  // Example: "webservers"
+  string limit = 15;
+  
+  // Whether to enable become/sudo privilege escalation.
+  // Example: false
+  bool become_enabled = 16;
+  
+  // Whether to show diff output for changed files.
+  // Example: false
+  bool diff_mode = 17;
+  
+  // Whether to allow multiple jobs from this template to run simultaneously.
+  // Example: false
+  bool allow_simultaneous = 18;
+}
+
+// GetJobTemplateRequest specifies which job template to retrieve.
+message GetJobTemplateRequest {
+  // Job template ID to retrieve.
+  // Example: 7
+  int32 id = 1;
+}
+
+// ListJobTemplatesRequest specifies pagination and filtering for job template queries.
+message ListJobTemplatesRequest {
+  // Page number for pagination, starting from 1.
+  // Example: 1
+  int32 page = 1;
+  
+  // Number of results per page. Default: 25, Maximum: 200.
+  // Example: 25
+  int32 page_size = 2;
+  
+  // Filter by exact name match.
+  // Example: "Deploy Web Servers"
+  string name = 3;
+  
+  // Filter by organization ID.
+  // Example: 1
+  int32 organization_id = 4;
+  
+  // Search across name, description fields.
+  // Example: "web"
+  string search = 5;
+  
+  // Order results by field. Prefix with - for descending.
+  // Example: "-created" or "name"
+  string order_by = 6;
+}
+
+// ListJobTemplatesResponse contains paginated job templates.
+message ListJobTemplatesResponse {
+  // Total count of job templates matching filters.
+  // Example: 42
+  int32 count = 1;
+  
+  // URL to next page or empty string if last page.
+  // Example: "/api/v2/job_templates/?page=2"
+  string next = 2;
+  
+  // URL to previous page or empty string if first page.
+  // Example: ""
+  string previous = 3;
+  
+  // Array of job template objects for current page.
+  repeated JobTemplate results = 4;
+}
+
+// LaunchJobTemplateRequest specifies parameters for launching a job.
+//
+// Launches a new job from the template with optional runtime overrides.
+// Any prompt-on-launch fields configured in the template can be overridden here.
+message LaunchJobTemplateRequest {
+  // ID of the job template to launch.
+  // Required. Example: 7
+  int32 id = 1;
+  
+  // Override the default inventory for this job run.
+  // Only works if ask_inventory_on_launch is true.
+  // Example: 10
+  int32 inventory_id = 2;
+  
+  // Override the limit pattern for this job run.
+  // Only works if ask_limit_on_launch is true.
+  // Example: "webservers:&production"
+  string limit = 3;
+  
+  // Override extra variables for this job run.
+  // JSON string of variable overrides.
+  // Example: "{\"env\": \"production\", \"debug\": false}"
+  string extra_vars = 4;
+  
+  // Override tags to run (--tags).
+  // Only works if ask_tags_on_launch is true.
+  // Example: "deploy,configure"
+  string tags = 5;
+  
+  // Override tags to skip (--skip-tags).
+  // Only works if ask_skip_tags_on_launch is true.
+  // Example: "backup,restart"
+  string skip_tags = 6;
+}
+
+// Job represents a running or completed job instance.
+//
+// Jobs are created when job templates are launched and represent
+// the actual execution of automation with real-time status.
+message Job {
+  // Unique identifier for this job instance.
+  // Example: 42
+  int32 id = 1;
+  
+  // Name inherited from the job template.
+  // Example: "Deploy Web Servers"
+  string name = 2;
+  
+  // Current job status.
+  // Values: "pending", "waiting", "running", "successful", "failed", "error", "cancelled"
+  // Example: "pending"
+  string status = 3;
+  
+  // ID of the job template this was launched from.
+  // Example: 7
+  int32 job_template_id = 4;
+  
+  // ISO 8601 timestamp when job was created/queued.
+  // Example: "2025-11-11T14:00:00Z"
+  string created = 5;
+  
+  // ISO 8601 timestamp when job started executing.
+  // Null if not started yet.
+  // Example: "2025-11-11T14:01:00Z"
+  string started = 6;
+  
+  // ISO 8601 timestamp when job finished.
+  // Null if still running.
+  // Example: "2025-11-11T14:05:30Z"
+  string finished = 7;
+  
+  // URL to view real-time job output.
+  // Example: "/api/v2/jobs/42/stdout/"
+  string stdout_url = 8;
+}
+

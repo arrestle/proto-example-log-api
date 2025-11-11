@@ -1,5 +1,5 @@
 # Paths
-PROTOC_VERSION = 26.0
+PROTOC_VERSION = 33.0
 PROTOC_DIR = tools/protoc_install
 PROTOC_TEMP_BIN = $(PROTOC_DIR)/bin/protoc
 TOOLS_DIR = tools
@@ -9,6 +9,8 @@ SHARED_DIR = shared
 LOGS_PROTO = $(OPENTELEMETRY_DIR)/opentelemetry/proto/logs/v1/logs.proto
 SHARED_PROTO = $(SHARED_DIR)/log_attributes.proto
 GATEWAY_PROTO = $(SHARED_DIR)/gateway_user_api.proto
+GATEWAY_AI_PROTO = $(SHARED_DIR)/gateway_user_api_with_ai.proto
+AWX_PROTO = $(SHARED_DIR)/awx_job_template.proto
 
 PROTOC_GEN_GO = $(TOOLS_DIR)/bin/protoc-gen-go
 PROTOC_GEN_GO_GRPC = $(TOOLS_DIR)/bin/protoc-gen-go-grpc
@@ -17,8 +19,8 @@ PROTOC_GEN_OPENAPI = $(TOOLS_DIR)/bin/protoc-gen-openapiv2
 .PHONY: all go python clean install-tools clean-tools check-tools
 
 # Build everything
-gen-all: check-go-version install-tools check-tools gen-go gen-python gen-gateway
-run-all: run-go-example run-py-example run-gateway-examples
+gen-all: check-go-version install-tools check-tools gen-go gen-python gen-gateway gen-awx
+run-all: run-go-example run-py-example run-gateway-examples run-awx-examples
 
 # Quick Go version check (run before install-tools)
 check-go-version:
@@ -122,10 +124,75 @@ gen-gateway-openapi:
 		--openapiv2_out=gen/openapi \
 		--openapiv2_opt=logtostderr=true \
 		$(GATEWAY_PROTO)
-	@echo "✓ Generated: gen/openapi/gateway_user_api.swagger.json"
+	@echo "✓ Generated: gen/openapi/shared/gateway_user_api.swagger.json"
+
+# Generate OpenAPI with AI extensions from enhanced proto
+gen-gateway-openapi-ai:
+	@echo "🔧 Generating OpenAPI 2.0 with AI extensions from gateway_user_api_with_ai.proto..."
+	@echo "⚠️  Note: Requires grpc-gateway protos in third_party/grpc-gateway/"
+	mkdir -p gen/openapi
+	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
+	$(TOOLS_DIR)/bin/protoc -I. \
+		-Ithird_party/grpc-gateway \
+		--openapiv2_out=gen/openapi \
+		--openapiv2_opt=logtostderr=true \
+		$(GATEWAY_AI_PROTO)
+	@echo "✓ Generated: gen/openapi/shared/gateway_user_api_with_ai.swagger.json"
+	@echo ""
+	@echo "Compare specs:"
+	@echo "  Simple:   gen/openapi/shared/gateway_user_api.swagger.json"
+	@echo "  Enhanced: gen/openapi/shared/gateway_user_api_with_ai.swagger.json"
 
 # Generate both Go and Python for Gateway API
 gen-gateway: gen-gateway-go gen-gateway-python gen-gateway-openapi
+
+# Generate AWX Job Template API (Go + Python + OpenAPI)
+gen-awx-go:
+	@echo "🔧 Generating Go code from awx_job_template.proto..."
+	@mkdir -p gen/go/github.com/ansible/proto-example-log-api/gen/go/awxpb
+	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
+	protoc -I. \
+		--go_out=gen/go \
+		--go-grpc_out=gen/go \
+		$(AWX_PROTO)
+	cd gen/go/github.com/ansible/proto-example-log-api/gen/go/awxpb && \
+		(test -f go.mod || go mod init github.com/ansible/proto-example-log-api/gen/go/awxpb) && \
+		go mod tidy
+
+gen-awx-python:
+	@echo "🔧 Generating Python code from awx_job_template.proto..."
+	mkdir -p gen/python
+	PYTHONPATH=$(abspath $(TOOLS_DIR))/python \
+	python -m grpc_tools.protoc -I. \
+		--python_out=gen/python \
+		--grpc_python_out=gen/python \
+		$(AWX_PROTO)
+
+gen-awx-openapi:
+	@echo "🔧 Generating OpenAPI from awx_job_template.proto..."
+	mkdir -p gen/openapi
+	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
+	protoc -I. \
+		--openapiv2_out=gen/openapi \
+		--openapiv2_opt=logtostderr=true \
+		$(AWX_PROTO)
+	@echo "✓ Generated: gen/openapi/shared/awx_job_template.swagger.json"
+
+gen-awx: gen-awx-go gen-awx-python gen-awx-openapi
+
+# Convert Swagger 2.0 specs to OpenAPI 3.0.3 (optional - requires npm/npx)
+convert-to-openapi3:
+	@echo "🔧 Converting Swagger 2.0 specs to OpenAPI 3.0.3..."
+	@command -v npx >/dev/null 2>&1 || (echo "❌ npx not found. Install Node.js/npm first" && exit 1)
+	@for spec in gen/openapi/shared/*.swagger.json; do \
+		base=$$(basename $$spec .swagger.json); \
+		echo "  Converting $$base..."; \
+		npx --yes swagger2openapi $$spec -o gen/openapi/shared/$${base}.openapi.yaml; \
+	done
+	@echo "✓ Converted specs to OpenAPI 3.0.3 in gen/openapi/shared/*.openapi.yaml"
+	@echo ""
+	@echo "Swagger 2.0 specs (original):  gen/openapi/shared/*.swagger.json"
+	@echo "OpenAPI 3.0.3 specs (converted): gen/openapi/shared/*.openapi.yaml"
 
  run-go-example: go
 	@echo ""
@@ -160,6 +227,19 @@ run-py-gateway-example:
 	python3 example/py_gateway/main.py
 
 run-gateway-examples: run-go-gateway-example run-py-gateway-example
+
+run-go-awx-example:
+	@echo ""
+	@echo "--running Go AWX Job Template example"
+	cd example/go_awx && go mod tidy && go run main.go
+
+run-py-awx-example:
+	@echo ""
+	@echo "--running Python AWX Job Template example"
+	PYTHONPATH=$(abspath $(TOOLS_DIR))/python:$(abspath gen/python) \
+	python3 example/py_awx/main.py
+
+run-awx-examples: run-go-awx-example run-py-awx-example
 
 # Clean all generated artifacts and tools
 clean:
@@ -216,11 +296,14 @@ help:
 	@echo "    gen-go                 Generate Go code from log_attributes.proto"
 	@echo "    gen-python             Generate Python code from log_attributes.proto"
 	@echo "    gen-gateway            Generate Gateway API (Go + Python + OpenAPI)"
-	@echo "      gen-gateway-openapi    → Generate OpenAPI 3.0 spec"
+	@echo "      gen-gateway-openapi    → Generate Swagger 2.0 spec (OpenAPI compatible)"
+	@echo "    gen-awx                Generate AWX Job Template API (Go + Python + OpenAPI)"
+	@echo "      gen-awx-openapi        → Generate Swagger 2.0 spec (OpenAPI compatible)"
 	@echo "  run-all                Run all examples (logging + gateway API)"
 	@echo "    run-go-example         Run go logging example"
 	@echo "    run-py-example         Run python logging example"
-	@echo "    run-gateway-examples   Run Gateway API examples"
+	@echo "    run-gateway-examples   Run Gateway API examples (Go + Python)"
+	@echo "    run-awx-examples       Run AWX Job Template examples (Go + Python)"
 	@echo "  run-otlp-example  A go program showing how to embed LogAttributes within an OTEL LogRecord"
 	@echo "                    **note**: Above would normally be carried in a binary payload"
 	@echo "                    and processed by otel toolslike grafana and not designed to be human-readable."

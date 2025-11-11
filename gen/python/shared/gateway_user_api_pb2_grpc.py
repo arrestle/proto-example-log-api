@@ -26,7 +26,11 @@ if _version_not_supported:
 
 
 class UserServiceStub(object):
-    """UserService provides operations for managing AAP Gateway users
+    """UserService provides operations for managing AAP Gateway users.
+
+    This service handles user account management including creation, retrieval,
+    and listing operations. All operations require appropriate authentication
+    and authorization via AAP Gateway's authentication system.
     """
 
     def __init__(self, channel):
@@ -53,25 +57,41 @@ class UserServiceStub(object):
 
 
 class UserServiceServicer(object):
-    """UserService provides operations for managing AAP Gateway users
+    """UserService provides operations for managing AAP Gateway users.
+
+    This service handles user account management including creation, retrieval,
+    and listing operations. All operations require appropriate authentication
+    and authorization via AAP Gateway's authentication system.
     """
 
     def GetUser(self, request, context):
-        """Get a single user by ID
+        """GetUser retrieves a single user account by their unique ID.
+
+        Returns the complete user record including username, email, and role information.
+        Requires authentication. Returns NOT_FOUND if user doesn't exist or caller
+        lacks permission to view the user.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def ListUsers(self, request, context):
-        """List users with optional filtering
+        """ListUsers retrieves a paginated list of users with optional filtering.
+
+        Supports filtering by username, email, and search across multiple fields.
+        Results are paginated with configurable page size. Requires authentication
+        and returns only users visible to the caller based on RBAC permissions.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def CreateUser(self, request, context):
-        """Create a new user
+        """CreateUser creates a new user account in AAP Gateway.
+
+        Creates a new user with the specified credentials and profile information.
+        Requires superuser privileges. Username must be unique. Password must meet
+        configured complexity requirements.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -104,7 +124,11 @@ def add_UserServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class UserService(object):
-    """UserService provides operations for managing AAP Gateway users
+    """UserService provides operations for managing AAP Gateway users.
+
+    This service handles user account management including creation, retrieval,
+    and listing operations. All operations require appropriate authentication
+    and authorization via AAP Gateway's authentication system.
     """
 
     @staticmethod

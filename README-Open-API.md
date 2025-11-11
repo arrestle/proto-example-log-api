@@ -1,15 +1,23 @@
-# Gateway API Demo: Proto → Go/Python/OpenAPI Generation
+# API Demonstrations: Proto → Go/Python/OpenAPI
 
-This demo extends log-schema to demonstrate proto-first API development for AAP Gateway User API, proving proto works for actual API services (not just logging structures).
+This demonstrates proto-first API development for real AAP services, proving proto works for production APIs (not just logging structures).
 
-## Why This Matters
+## What This Includes
 
-Single `.proto` file generates:
+**Three API Examples:**
+
+| API | Service | Proto Lines | Generated | Purpose |
+|-----|---------|-------------|-----------|---------|
+| **Gateway User API** | AAP Gateway | 143 | ~1,000 lines | User management |
+| **AWX Job Template API** | Controller | 245 | ~1,500 lines | **Job execution (most common AWX API)** |
+| **Combined Total** | - | 388 | ~2,500 lines | Real production APIs |
+
+**Single command generates:**
 - ✅ Go gRPC server code
 - ✅ Python gRPC code
-- ✅ **OpenAPI specification** (for MCP, UI teams, partners)
+- ✅ **OpenAPI specifications** (Swagger 2.0 → convertible to OpenAPI 3.0.3)
 
-All from one source of truth - demonstrating **contract-first development** with mature tooling.
+All from proto source of truth - demonstrating **contract-first development** with mature, current tooling (protoc 33.0, Nov 2025).
 
 ## Prerequisites
 
@@ -29,42 +37,39 @@ gvm use go1.24.6 --default
 ## Quick Start
 
 ```bash
-# 1. Install all tools (protoc, protoc-gen-go, protoc-gen-openapi, etc.)
-make install-tools
-
-# 2. Generate everything from gateway_user_api.proto
-make gen-gateway
-
-# 3. Verify what was generated
-ls gen/go/.../gatewaypb/              # Go gRPC code
-ls gen/python/shared/                 # Python gRPC code
-cat gen/openapi/shared/*.swagger.json # OpenAPI spec!
-
-# 4. Run the examples
-make run-gateway-examples
+make gen-all     # Generate everything (logging + APIs + OpenAPI specs)
+make run-all     # Run all examples
+make help        # See all available commands
 ```
 
 ## What Gets Generated
 
-### From `shared/gateway_user_api.proto` (143 lines)
+### Gateway User API: `make gen-gateway`
 
-**Single command:** `make gen-gateway`
+**From:** `shared/gateway_user_api.proto` (143 lines)
 
-**Generates:**
+**Generates:** ~1,000 lines
+- Go gRPC code (~680 lines) in `gen/go/.../gatewaypb/`
+- Python gRPC code (~200 lines) in `gen/python/shared/`
+- OpenAPI spec (116 lines) in `gen/openapi/shared/gateway_user_api.swagger.json`
 
-1. **Go gRPC Code** (~680 lines)
-   - Message types and gRPC service/client
-   - Location: `gen/go/.../gatewaypb/`
+### AWX Job Template API: `make gen-awx`
 
-2. **Python gRPC Code** (~200 lines)
-   - Message classes and gRPC stubs
-   - Location: `gen/python/shared/`
+**From:** `shared/awx_job_template.proto` (245 lines) - **Real Controller API**
 
-3. **OpenAPI Specification** (~116 lines)
-   - Swagger 2.0 / OpenAPI compatible
-   - Location: `gen/openapi/shared/gateway_user_api.swagger.json`
+**Generates:** ~1,500 lines
+- Go gRPC code (~1,055 lines) in `gen/go/.../awxpb/`
+- Python gRPC code (~250 lines) in `gen/python/shared/`
+- OpenAPI spec (201 lines) in `gen/openapi/shared/awx_job_template.swagger.json`
 
-**Total: ~1,000 lines generated from 143 lines of proto (7x multiplication)**
+**AWX Job Template is the most commonly used Controller API** - demonstrates proto works for real production APIs that launch automation jobs.
+
+### OpenAPI Format
+
+**Generated format:** Swagger 2.0 (MCP-compatible)
+**Optional conversion:** `make convert-to-openapi3` → OpenAPI 3.0.3 YAML (AAP standard)
+
+**Tooling:** protoc 33.0 (latest, Nov 2025) + Go plugins @latest
 
 ## Key Demonstrations
 
@@ -125,7 +130,7 @@ string username = 2;
 }
 ```
 
-**MCP-compatible:** Yes! MCP parses `title` and `description` fields.
+**MCP-compatible:** Yes! MCP parses `title` and `description` fields. LLMs extract descriptions, types, examples, and usage context from proto comments - no x-llm-* extensions required.
 
 ### ✅ Single Source, Multiple Outputs
 
@@ -140,61 +145,91 @@ make gen-gateway
 └─→ All guaranteed to match (same source)
 ```
 
-## Makefile Targets
+## Available Commands
 
-```bash
-make gen-gateway            # Generate Go + Python + OpenAPI
-make gen-gateway-go         # Generate Go only
-make gen-gateway-python     # Generate Python only
-make gen-gateway-openapi    # Generate OpenAPI only
-
-make run-gateway-examples   # Run both Go and Python examples
-make clean                  # Remove all generated artifacts
-make help                   # Show all available targets
-```
+Run `make help` to see all available targets.
 
 ## Connection to ANSTRAT-1738
 
-This demo addresses SDP-0050 problem statements:
+### Addresses SDP-0050 Problem Statements
 
-**P1: How do we standardize OpenAPI format?**
-- Proto generates consistent OpenAPI (Swagger 2.0 / OpenAPI compatible)
-- Same format whether service is Python or Go
+**P1: Standardize OpenAPI format**
+- Proto generates consistent Swagger 2.0 (convertible to OpenAPI 3.0.3)
+- Same format whether service is Python (Django) or Go
 
-**P2: How do we integrate into CI/CD?**
-- `make gen-gateway` is the CI validation step
-- Proto compilation catches contract changes
+**P2: Integrate into CI/CD**
+- `make gen-gateway` / `make gen-awx` validate proto contracts
 - Breaking changes detected at build time
+- No development deadlocks
 
-**P12: How do we ensure downstream tooling (MCP) integration?**
+**P12: Downstream tooling (MCP) integration**
 - Proto → OpenAPI pipeline automatic
-- Rich descriptions from proto comments
-- MCP-compatible format
+- Rich documentation from proto comments
+- MCP-compatible (Tami confirmed: "version 3.0.3 was sufficient")
 
-## Files
+### Addresses Controller Migration Issue
+
+**From Agentic AI Demo - Initiative 1 & 2 November 11th meeting (Tami - MCP team):**
+> "The biggest problem was on Controller spec, which was not in v3 format yet"
+
+**AWX Job Template demo shows:**
+- Controller's most common API (job execution) defined in proto
+- Generates Swagger 2.0 → convertible to OpenAPI 3.0.3
+- Provides Controller migration path from current Swagger 2.0
+
+## Repository Structure
 
 ```
-shared/
-└── gateway_user_api.proto    # API service definition (source of truth)
+shared/                      # Proto source files
+├── gateway_user_api.proto   # Gateway User API
+└── awx_job_template.proto   # AWX Job Template API
 
-example/
-├── go_gateway/               # Go example using generated code
-│   ├── main.go
-│   └── go.mod
-└── py_gateway/               # Python example using generated code
-    ├── main.py
-    └── __init__
+example/                     # Example code using generated protos
+├── go_gateway/              # Go Gateway API example
+└── py_gateway/              # Python Gateway API example
 
-gen/                          # Generated (not committed)
-├── go/.../gatewaypb/         # Go gRPC code
-├── python/shared/            # Python gRPC code
-└── openapi/shared/           # OpenAPI spec
+gen/                         # Generated code (not committed)
+├── go/                      # Go gRPC code
+├── python/                  # Python gRPC code
+└── openapi/                 # OpenAPI specs (.swagger.json, .openapi.yaml)
 ```
+
+## AI/LLM Extensions for MCP
+
+Proto generates MCP-compatible OpenAPI via comments (simple) or annotations (enhanced).
+
+### Two Approaches
+
+| Approach | File | Dependencies | Lines | AI Support |
+|----------|------|--------------|-------|------------|
+| **Simple** (current) | `gateway_user_api.proto` | None | 143 | Good - comments → title/description |
+| **Enhanced** (optional) | `gateway_user_api_with_ai.proto` | grpc-gateway | ~280 | Excellent - structured x-ai-* extensions |
+
+**Recommendation:** Simple approach sufficient for MCP. Use enhanced only if MCP team requests specific x-ai-* extensions.
+
+### MCP Consumption
+
+**Current proto comments provide:** Descriptions, types, examples, constraints - MCP can parse these from `title`/`description` fields.
+
+**Optional x-ai-* extensions** (via `gateway_user_api_with_ai.proto`): `x-ai-reasoning-instructions`, `x-ai-capabilities`, `x-openai-isConsequential`, `x-ai-hint`, `x-aap-rbac-permission`.
+
+**Recommendation:** Simple proto comments sufficient. Add x-ai-* only if MCP team specifically requests them.
+
+### References
+
+| Resource | URL |
+|----------|-----|
+| OpenAPI Extensions Spec | https://spec.openapis.org/oas/v3.0.0#specification-extensions |
+| Microsoft x-ai-* Catalog | https://deepwiki.com/microsoft/OpenAPI/2-openapi-extensions-catalog |
+| OpenAI Consequential Flag | https://platform.openai.com/docs/actions/consequential-flag |
+| Agentic API Patterns | https://agenticapi.io/docs/openapi-extensions/ |
+| grpc-gateway Options | https://github.com/grpc-ecosystem/grpc-gateway/tree/main/protoc-gen-openapiv2/options |
+| Model Context Protocol | https://spec.modelcontextprotocol.io/ |
 
 ## Related Documentation
 
-- **[README-Structured-Logging.md](README-Structured-Logging.md)** - Original log-schema documentation
-- **Makefile** - Run `make help` for all available commands
+- **[README-Structured-Logging.md](README-Structured-Logging.md)** - Original logging demo
+- **`shared/gateway_user_api_with_ai.proto`** - Optional: Enhanced proto with x-ai-* annotations
 
 ## For ANSTRAT-1738 Discussion
 
@@ -202,7 +237,8 @@ This branch demonstrates:
 1. **Proto-first** works for AAP APIs (not just logging)
 2. **Contract-first** is achievable with protoc tooling
 3. **OpenAPI generated automatically** for MCP consumption
-4. **Same pattern as log-schema**, just expanded to API services
+4. **AI/LLM extensions** supported via proto annotations or post-processing
+5. **Same pattern as log-schema**, just expanded to API services
 
 Branch: `open-api-demo`
 

@@ -1,0 +1,201 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "shared/awx_job_template.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "JobTemplateService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Unique identifier for this job instance.\nExample: 42"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name inherited from the job template.\nExample: \"Deploy Web Servers\""
+        },
+        "status": {
+          "type": "string",
+          "title": "Current job status.\nValues: \"pending\", \"waiting\", \"running\", \"successful\", \"failed\", \"error\", \"cancelled\"\nExample: \"pending\""
+        },
+        "jobTemplateId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ID of the job template this was launched from.\nExample: 7"
+        },
+        "created": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when job was created/queued.\nExample: \"2025-11-11T14:00:00Z\""
+        },
+        "started": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when job started executing.\nNull if not started yet.\nExample: \"2025-11-11T14:01:00Z\""
+        },
+        "finished": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when job finished.\nNull if still running.\nExample: \"2025-11-11T14:05:30Z\""
+        },
+        "stdoutUrl": {
+          "type": "string",
+          "title": "URL to view real-time job output.\nExample: \"/api/v2/jobs/42/stdout/\""
+        }
+      },
+      "description": "Job represents a running or completed job instance.\n\nJobs are created when job templates are launched and represent\nthe actual execution of automation with real-time status."
+    },
+    "v1JobTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Unique identifier for the job template.\nExample: 7"
+        },
+        "name": {
+          "type": "string",
+          "title": "Human-readable name for the template.\nMust be unique within the organization.\nExample: \"Deploy Web Servers\""
+        },
+        "description": {
+          "type": "string",
+          "title": "Optional description explaining the template's purpose.\nExample: \"Deploys Apache web servers to production\""
+        },
+        "jobType": {
+          "type": "string",
+          "title": "Type of job to run: \"run\" (normal execution) or \"check\" (dry-run mode).\nExample: \"run\""
+        },
+        "projectId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ID of the project containing the playbook source code.\nExample: 5"
+        },
+        "inventoryId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "ID of the inventory defining target hosts.\nExample: 3"
+        },
+        "playbook": {
+          "type": "string",
+          "title": "Name of the playbook file within the project to execute.\nExample: \"site.yml\" or \"playbooks/deploy.yml\""
+        },
+        "organizationId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Organization that owns this job template.\nExample: 1"
+        },
+        "status": {
+          "type": "string",
+          "title": "Current status of the job template.\nValues: \"never updated\", \"ok\", \"successful\", \"failed\", \"error\", \"cancelled\"\nBased on the most recent job execution.\nExample: \"successful\""
+        },
+        "created": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when created.\nExample: \"2025-01-15T10:00:00Z\""
+        },
+        "modified": {
+          "type": "string",
+          "title": "ISO 8601 timestamp when last modified.\nExample: \"2025-10-29T14:30:00Z\""
+        },
+        "verbosity": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Ansible verbosity level (0-5).\n0=normal, 1=-v, 2=-vv, 3=-vvv, 4=-vvvv, 5=-vvvvv\nExample: 0"
+        },
+        "forks": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Number of parallel processes"
+        },
+        "timeout": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Job timeout in seconds. 0 means no timeout.\nExample: 0"
+        },
+        "limit": {
+          "type": "string",
+          "title": "Pattern of hosts to target"
+        },
+        "becomeEnabled": {
+          "type": "boolean",
+          "title": "Whether to enable become/sudo privilege escalation.\nExample: false"
+        },
+        "diffMode": {
+          "type": "boolean",
+          "title": "Whether to show diff output for changed files.\nExample: false"
+        },
+        "allowSimultaneous": {
+          "type": "boolean",
+          "title": "Whether to allow multiple jobs from this template to run simultaneously.\nExample: false"
+        }
+      },
+      "description": "JobTemplate represents a reusable definition for running Ansible playbooks.\n\nJob templates combine a project (source code), inventory (target hosts),\ncredentials (access), and playbook into a reusable automation definition.\nThey are the core abstraction for automation execution in AWX/Controller."
+    },
+    "v1ListJobTemplatesResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Total count of job templates matching filters.\nExample: 42"
+        },
+        "next": {
+          "type": "string",
+          "title": "URL to next page or empty string if last page.\nExample: \"/api/v2/job_templates/?page=2\""
+        },
+        "previous": {
+          "type": "string",
+          "title": "URL to previous page or empty string if first page.\nExample: \"\""
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1JobTemplate"
+          },
+          "description": "Array of job template objects for current page."
+        }
+      },
+      "description": "ListJobTemplatesResponse contains paginated job templates."
+    }
+  }
+}
