@@ -14,6 +14,7 @@ Controller needs OpenAPI 3.0.3 | MCP needs specs by Dec | ATF needs contract sta
 - **Compatibility protection** - Field number immutability prevents breaking changes 
 - **OpenAPI 3.0.3 output** - Generates Swagger 2.0, converts to 3.0.3
 - **Polyglot support** - One proto → Go and Python code (AAP already uses this via K8s client libraries)
+- **OpenTelemetry compatibility** - OTEL uses protobuf for telemetry data (structured logging demo shows this)
 - **Future performance opportunities** - 10x CPU, 2x bandwidth (Kubernetes experience)
 
 ### AAP's Existing Protobuf Dependencies
