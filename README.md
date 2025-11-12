@@ -20,9 +20,12 @@ Controller needs OpenAPI 3.0.3 | MCP needs specs by Dec | ATF needs contract sta
 ### AAP's Existing Protobuf Dependencies
 
 **AAP components already depend on protobuf:**
-- **Kubernetes APIs** - Receptor (Go) and Controller/Gateway (Python) use K8s client libraries. K8s proto definitions generate clients for both languages - same polyglot pattern
-- **Operator Deployments** - AAP deployed via operators (OpenShift, EKS, GKE, AKS, vanilla K8s) uses Kubernetes protobuf APIs
+- **Controller/AWX** - Already has protobuf==6.32.1, grpcio==1.75.1, opentelemetry-proto==1.37.0 in requirements.txt (for OpenTelemetry)
+- **Kubernetes APIs** - Receptor (Go) and Controller/Gateway (Python) use K8s client libraries. K8s proto definitions generate clients for both languages - same polyglot pattern  
+- **Operator Deployments** - AAP via operators uses Kubernetes protobuf APIs
 - **Envoy** - Gateway proxy uses Envoy ([protobuf-based configuration](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/overview))
+
+**No new dependencies** - Controller team already has all protobuf libraries needed.
 
 ---
 
