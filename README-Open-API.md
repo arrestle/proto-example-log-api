@@ -162,7 +162,7 @@ Run `make help` to see all available targets.
 - Breaking changes detected at build time
 - No development deadlocks
 
-**P12: Downstream tooling (MCP) integration**
+**P12: Downstream tooling (MCP) integration** ([ANSTRAT-1646](https://issues.redhat.com/browse/ANSTRAT-1646))
 - Proto → OpenAPI pipeline automatic
 - Rich documentation from proto comments
 - MCP-compatible (Tami confirmed: "version 3.0.3 was sufficient")
