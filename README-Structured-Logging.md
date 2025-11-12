@@ -1,14 +1,17 @@
 # Structured Logging Across Languages with Protobuf
 
-This repo demonstrates a simple, dependency-light approach for sharing a `.proto` file that combines OpenTelemetry and Ansible-specific fields across Python and Go. It generates language-specific structs for structured (JSON) logging using standard `protoc` tooling.
+**Created:** Original log-schema repository (6+ months ago)
+**Purpose:** Proof-of-concept for cross-language structured logging
+
+This demonstrates a simple, dependency-light approach for sharing `.proto` files that combine OpenTelemetry and Ansible-specific fields across Python and Go. It generates language-specific structs for structured (JSON) logging using standard `protoc` tooling.
+
+**Note:** This is the original demo for protobuf structs only in the context of shared python and golang structured logging. See [README.md](README.md) for the expanded API demonstrations added November 2025.
 
 ## Why are we doing this? Why do you care?
 
 We agree that OTEL implementation is slotted for phase 2. We propose the use of Protobuf in phase 1 to allow us to generate identical JSON structures in both Python and Go as demonstrated in this repo.
 
 Protobuf generated data structures allow us to implement JSON structured logging now, and clarify the path forward to OTEL tracing in phase 2. We will also have the opportunity to socialize Protobuf with less complex .proto files before we tackle OTEL implementation.
-
-**NEW: Gateway API Demo** - This repo now also demonstrates proto → API service definitions with automatic OpenAPI generation, proving proto-first works for actual AAP APIs.
 
 
 **Note:** This is a minimal proof of concept. Logs are serialized as JSON rather than binary OTLP, and utilize only standard Python and Go libraries.

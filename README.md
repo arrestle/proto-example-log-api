@@ -1,6 +1,6 @@
 # Proto-First API Development for AAP
 
-**TL;DR:** This repo proves protobuf solves [ANSTRAT-1738](https://issues.redhat.com/browse/ANSTRAT-1738) OpenAPI standardization. Working demo of real AAP APIs (Gateway + Controller) generating Go, Python, and OpenAPI from single proto source. Addresses all stakeholder concerns with running code.
+**TL;DR:** This repo demonstrates protobuf as an implementation approach for [ANSTRAT-1738](https://issues.redhat.com/browse/ANSTRAT-1738) OpenAPI standardization. Working demo of real AAP APIs (Gateway + Controller) generating Go, Python, and OpenAPI from single proto source.
 
 ---
 
@@ -12,17 +12,16 @@ Controller needs OpenAPI 3.0.3 | MCP needs specs by Dec | ATF needs contract sta
 **What Protobuf Offers:**
 - **Contract-first by design** - Proto file required before code generation
 - **Compatibility protection** - Field number immutability prevents breaking changes 
-- **OpenAPI 3.0.3 output** - Generates Swagger 2.0, converts to 3.0.3, allows ai-x attributes
-- **Polyglot support** - One proto → Go and Python code - Supports most modern languages
+- **OpenAPI 3.0.3 output** - Generates Swagger 2.0, converts to 3.0.3
+- **Polyglot support** - One proto → Go and Python code (AAP already uses this via K8s client libraries)
 - **Future performance opportunities** - 10x CPU, 2x bandwidth (Kubernetes experience)
 
 ### AAP's Existing Protobuf Dependencies
 
-**Production systems using protobuf today:**
-- **Receptor** - QUIC networking layer uses protobuf for all inter-service communication (AAP 2.5+, core platform)
-- **Kubernetes APIs** - Controller/Gateway use K8s protobuf APIs for pod management, scaling, health checks
-- **OpenShift Deployments** - Every AAP on OpenShift depends on K8s protobuf communication
-- **Envoy Proxy** - Gateway traffic routing uses Envoy (APIs defined in protobuf, handles all AAP HTTP traffic)
+**AAP components already depend on protobuf:**
+- **Kubernetes APIs** - Receptor (Go) and Controller/Gateway (Python) use K8s client libraries. K8s proto definitions generate clients for both languages - same polyglot pattern
+- **Operator Deployments** - AAP deployed via operators (OpenShift, EKS, GKE, AKS, vanilla K8s) uses Kubernetes protobuf APIs
+- **Envoy** - Gateway proxy uses Envoy ([protobuf-based configuration](https://www.envoyproxy.io/docs/envoy/latest/configuration/overview/overview))
 
 ---
 
@@ -51,19 +50,6 @@ Controller needs OpenAPI 3.0.3 | MCP needs specs by Dec | ATF needs contract sta
 
 ---
 
-## 🏭 Industry Proof (Not Experimental)
-
-**AAP Already Depends on Protobuf (In Production Today):**
-- **Receptor** - QUIC protocol implementation requires protobuf (AAP 2.5+, core networking)
-- **Gateway** - Envoy proxy configured entirely via protobuf (all AAP traffic flows through this)
-- **Kubernetes Clients** - Controller/Gateway K8s integration uses protobuf APIs (pod management, scaling)
-- **OpenShift Deployments** - All AAP on OpenShift uses K8s protobuf APIs
-
-**AAP services already have protobuf in their dependency chain** - this formalizes existing practice, not introduces new technology.
-
-**Industry adoption:** Google, Netflix, Uber, Lyft (see [Industry Adoption](#industry-adoption) for references).
-
----
 
 ## Three Demonstrations
 
@@ -109,18 +95,14 @@ make help                   # See all commands
 ✅ **Contract-first development** - Proto must exist before code generation  
 ✅ **Cross-language type safety** - Same proto generates Go and Python with identical types  
 ✅ **OpenAPI generation** - Automatic spec generation from proto for MCP/UI/partners  
-✅ **Single source of truth** - All artifacts guaranteed to match (from same proto)  
+✅ **Single source of truth** - All artifacts generated from same proto source  
 ✅ **Real AWX/Controller APIs** - Works for actual production APIs (Job Templates)
 
 ## Connection to ANSTRAT-1738
 
-This repository demonstrates implementation approaches for the OpenAPI standardization initiative (ANSTRAT-1738), showing how proto-first development can:
-- Standardize API contracts across Python and Go services
-- Generate OpenAPI specs automatically for downstream consumers
-- Enable contract-first development with mature tooling
-- Maintain type safety across language boundaries
+Demonstrates implementation approach for [ANSTRAT-1738](https://issues.redhat.com/browse/ANSTRAT-1738) OpenAPI standardization.
 
-**Branch:** `open-api-demo`
+**See [README-Open-API.md](README-Open-API.md)** for detailed mapping to [Contract-Driven Development SDP (PR #870)](https://github.com/ansible/handbook/pull/870) problem statements.
 
 ---
 
@@ -155,6 +137,12 @@ Run `make help` for all available Makefile targets.
 - **[README-Open-API.md](README-Open-API.md)** - API demonstrations (Gateway + AWX)
 - **`shared/gateway_user_api_with_ai.proto`** - Optional: Enhanced proto with x-ai-* annotations
 
+### Ansible Engineering Handbook
+
+- **[SDP-0050: Contract-Driven Development](https://github.com/ansible/handbook/blob/main/The%20Ansible%20Engineering%20Handbook/System%20Design%20Plans/0050-Contract-Driven-Development-Initial-OpenAPI-Specification-Adoption.md)** (PR #870) - Andrew Potozniak's SDP defining contract-driven approach for AAP
+- **[Proposal 0067: Architecture Review Responsibilities](https://github.com/ansible/handbook/blob/main/The%20Ansible%20Engineering%20Handbook/proposals/0067-Architecture%20Review%20Responsibilities.md)** - FA/PDT 3IB governance structure
+- **[Architectural Principle 7: API First](https://github.com/ansible/handbook/blob/main/The%20Ansible%20Engineering%20Handbook/Architecture/Principles.md#architectural-principle-7-application-development-is-api-first)** - AAP's API-first development principle
+
 ### Primary Initiatives
 
 **[ANSTRAT-1738](https://issues.redhat.com/browse/ANSTRAT-1738) - Collecting, Centralizing and Enforcing OpenAPI Spec for AAP Services**
@@ -175,7 +163,8 @@ Run `make help` for all available Makefile targets.
 
 ### Key Stakeholder Feedback
 
-**[SDP-0050: Contract-Driven Development (PR #870)](https://github.com/ansible/handbook/pull/870)**
+**[Contract-Driven Development SDP (PR #870)](https://github.com/ansible/handbook/pull/870)** (Andrew Potozniak)
+- **SDP:** [0050-Contract-Driven-Development-Initial-OpenAPI-Specification-Adoption.md](https://github.com/ansible/handbook/blob/main/The%20Ansible%20Engineering%20Handbook/System%20Design%20Plans/0050-Contract-Driven-Development-Initial-OpenAPI-Specification-Adoption.md)
 
 **Alan Coding (Controller team):**
 > "You have to implement it to get the OpenAPI spec. All the tooling mentioned generates the spec from the code."
@@ -244,5 +233,5 @@ Run `make help` for all available Makefile targets.
 - Epic for training and team enablement
 
 **[AAP-56421](https://issues.redhat.com/browse/AAP-56421) - Create SDP for API-First Development**
-- PR #870 (SDP-0050)
+- PR #870 (Contract-Driven Development SDP by Andrew Potozniak)
 - In review

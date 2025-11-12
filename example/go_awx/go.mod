@@ -16,4 +16,3 @@ require (
 )
 
 replace github.com/ansible/proto-example-log-api/gen/go/awxpb => ../../gen/go/github.com/ansible/proto-example-log-api/gen/go/awxpb
-
