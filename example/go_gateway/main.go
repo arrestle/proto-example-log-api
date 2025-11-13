@@ -7,12 +7,16 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"example.com/protohelper"
 	gatewaypb "github.com/ansible/log-schema/gen/go/gatewaypb"
 )
 
 func main() {
 	ctx := context.Background()
-	
+
+	// Display REST endpoints from proto annotations
+	protohelper.PrintRESTEndpoints(gatewaypb.File_shared_gateway_user_api_proto)
+
 	// Example 1: Create a User
 	newUser := &gatewaypb.User{
 		Id:          1,
@@ -71,4 +75,3 @@ func main() {
 
 	_ = ctx // satisfy linter
 }
-

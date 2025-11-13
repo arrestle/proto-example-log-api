@@ -7,14 +7,14 @@ This document provides technical details for Gateway User API and AWX Job Templa
 
 ## Available Demos
 
-| Command | What It Does |
-|---------|--------------|
-| `make gen-gateway` | Proto → Go code + Python code + Swagger 2.0 spec |
-| `make gen-awx` | Proto → Go code + Python code + Swagger 2.0 spec |
-| `make convert-to-openapi3` | Swagger 2.0 → OpenAPI 3.0.3 (for AAP/MCP) |
-| `make run-gateway-examples` | Run examples using generated Go/Python code (sample data) |
-| `make run-awx-examples` | Run examples using generated Go/Python code (sample data) |
-| `make mcp` | (TBD) Generate MCP server tools from OpenAPI 3.0.3 specs |
+| Command | What It Does | Output Folders |
+|---------|--------------|----------------|
+| `make gen-gateway` | Proto → Go + Python + Swagger 2.0 (REST: GET/POST /api/gateway/v1/users) | `gen/go/*`<br>`gen/python/*`<br>`gen/openapi/*` |
+| `make gen-awx` | Proto → Go + Python + Swagger 2.0 (REST: GET/POST /api/v2/job_templates) | `gen/go/*`<br>`gen/python/*`<br>`gen/openapi/*` |
+| `make convert-to-openapi3` | Swagger 2.0 → OpenAPI 3.0.3 (with full REST paths) | `gen/openapi/*.openapi.yaml` |
+| `make run-gateway-examples` | Run Gateway examples (Go/Python sample requests) | Console output |
+| `make run-awx-examples` | Run AWX examples (Go/Python sample requests) | Console output |
+| `make mcp` | (TBD) Generate MCP server from OpenAPI 3.0.3 | (TBD) |
 
 
 **AWX Job Template** is Controller's most commonly used API.

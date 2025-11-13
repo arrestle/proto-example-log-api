@@ -22,9 +22,10 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dshared/gateway_user_api.proto\x12\x0e\x61\x61p.gateway.v1\"\x93\x01\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x12\n\nfirst_name\x18\x04 \x01(\t\x12\x11\n\tlast_name\x18\x05 \x01(\t\x12\x14\n\x0cis_superuser\x18\x06 \x01(\x08\x12\x0f\n\x07\x63reated\x18\x07 \x01(\t\x12\x10\n\x08modified\x18\x08 \x01(\t\"\x1c\n\x0eGetUserRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"C\n\x10ListUsersRequest\x12\x0c\n\x04page\x18\x01 \x01(\x05\x12\x11\n\tpage_size\x18\x02 \x01(\x05\x12\x0e\n\x06search\x18\x03 \x01(\t\"i\n\x11ListUsersResponse\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\x12\x0c\n\x04next\x18\x02 \x01(\t\x12\x10\n\x08previous\x18\x03 \x01(\t\x12%\n\x07results\x18\x04 \x03(\x0b\x32\x14.aap.gateway.v1.User\"m\n\x11\x43reateUserRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x12\n\nfirst_name\x18\x04 \x01(\t\x12\x11\n\tlast_name\x18\x05 \x01(\t2\xed\x01\n\x0bUserService\x12\x41\n\x07GetUser\x12\x1e.aap.gateway.v1.GetUserRequest\x1a\x14.aap.gateway.v1.User\"\x00\x12R\n\tListUsers\x12 .aap.gateway.v1.ListUsersRequest\x1a!.aap.gateway.v1.ListUsersResponse\"\x00\x12G\n\nCreateUser\x12!.aap.gateway.v1.CreateUserRequest\x1a\x14.aap.gateway.v1.User\"\x00\x42\x30Z.github.com/ansible/log-schema/gen/go/gatewaypbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dshared/gateway_user_api.proto\x12\x0e\x61\x61p.gateway.v1\x1a\x1cgoogle/api/annotations.proto\"\x93\x01\n\x04User\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x12\n\nfirst_name\x18\x04 \x01(\t\x12\x11\n\tlast_name\x18\x05 \x01(\t\x12\x14\n\x0cis_superuser\x18\x06 \x01(\x08\x12\x0f\n\x07\x63reated\x18\x07 \x01(\t\x12\x10\n\x08modified\x18\x08 \x01(\t\"\x1c\n\x0eGetUserRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"C\n\x10ListUsersRequest\x12\x0c\n\x04page\x18\x01 \x01(\x05\x12\x11\n\tpage_size\x18\x02 \x01(\x05\x12\x0e\n\x06search\x18\x03 \x01(\t\"i\n\x11ListUsersResponse\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\x12\x0c\n\x04next\x18\x02 \x01(\t\x12\x10\n\x08previous\x18\x03 \x01(\t\x12%\n\x07results\x18\x04 \x03(\x0b\x32\x14.aap.gateway.v1.User\"m\n\x11\x43reateUserRequest\x12\x10\n\x08username\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\r\n\x05\x65mail\x18\x03 \x01(\t\x12\x12\n\nfirst_name\x18\x04 \x01(\t\x12\x11\n\tlast_name\x18\x05 \x01(\t2\xcc\x02\n\x0bUserService\x12\x63\n\x07GetUser\x12\x1e.aap.gateway.v1.GetUserRequest\x1a\x14.aap.gateway.v1.User\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/gateway/v1/users/{id}\x12o\n\tListUsers\x12 .aap.gateway.v1.ListUsersRequest\x1a!.aap.gateway.v1.ListUsersResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/gateway/v1/users\x12g\n\nCreateUser\x12!.aap.gateway.v1.CreateUserRequest\x1a\x14.aap.gateway.v1.User\" \x82\xd3\xe4\x93\x02\x1a\"\x15/api/gateway/v1/users:\x01*B0Z.github.com/ansible/log-schema/gen/go/gatewaypbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,16 +33,22 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'shared.gateway_user_api_pb2
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z.github.com/ansible/log-schema/gen/go/gatewaypb'
-  _globals['_USER']._serialized_start=50
-  _globals['_USER']._serialized_end=197
-  _globals['_GETUSERREQUEST']._serialized_start=199
-  _globals['_GETUSERREQUEST']._serialized_end=227
-  _globals['_LISTUSERSREQUEST']._serialized_start=229
-  _globals['_LISTUSERSREQUEST']._serialized_end=296
-  _globals['_LISTUSERSRESPONSE']._serialized_start=298
-  _globals['_LISTUSERSRESPONSE']._serialized_end=403
-  _globals['_CREATEUSERREQUEST']._serialized_start=405
-  _globals['_CREATEUSERREQUEST']._serialized_end=514
-  _globals['_USERSERVICE']._serialized_start=517
-  _globals['_USERSERVICE']._serialized_end=754
+  _globals['_USERSERVICE'].methods_by_name['GetUser']._loaded_options = None
+  _globals['_USERSERVICE'].methods_by_name['GetUser']._serialized_options = b'\202\323\344\223\002\034\022\032/api/gateway/v1/users/{id}'
+  _globals['_USERSERVICE'].methods_by_name['ListUsers']._loaded_options = None
+  _globals['_USERSERVICE'].methods_by_name['ListUsers']._serialized_options = b'\202\323\344\223\002\027\022\025/api/gateway/v1/users'
+  _globals['_USERSERVICE'].methods_by_name['CreateUser']._loaded_options = None
+  _globals['_USERSERVICE'].methods_by_name['CreateUser']._serialized_options = b'\202\323\344\223\002\032\"\025/api/gateway/v1/users:\001*'
+  _globals['_USER']._serialized_start=80
+  _globals['_USER']._serialized_end=227
+  _globals['_GETUSERREQUEST']._serialized_start=229
+  _globals['_GETUSERREQUEST']._serialized_end=257
+  _globals['_LISTUSERSREQUEST']._serialized_start=259
+  _globals['_LISTUSERSREQUEST']._serialized_end=326
+  _globals['_LISTUSERSRESPONSE']._serialized_start=328
+  _globals['_LISTUSERSRESPONSE']._serialized_end=433
+  _globals['_CREATEUSERREQUEST']._serialized_start=435
+  _globals['_CREATEUSERREQUEST']._serialized_end=544
+  _globals['_USERSERVICE']._serialized_start=547
+  _globals['_USERSERVICE']._serialized_end=879
 # @@protoc_insertion_point(module_scope)

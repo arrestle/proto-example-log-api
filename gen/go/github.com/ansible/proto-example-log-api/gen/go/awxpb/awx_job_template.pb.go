@@ -7,6 +7,7 @@
 package awxpb
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -700,7 +701,7 @@ var File_shared_awx_job_template_proto protoreflect.FileDescriptor
 
 const file_shared_awx_job_template_proto_rawDesc = "" +
 	"\n" +
-	"\x1dshared/awx_job_template.proto\x12\x11awx.controller.v1\"\x9a\x04\n" +
+	"\x1dshared/awx_job_template.proto\x12\x11awx.controller.v1\x1a\x1cgoogle/api/annotations.proto\"\x9a\x04\n" +
 	"\vJobTemplate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -753,11 +754,11 @@ const file_shared_awx_job_template_proto_rawDesc = "" +
 	"\astarted\x18\x06 \x01(\tR\astarted\x12\x1a\n" +
 	"\bfinished\x18\a \x01(\tR\bfinished\x12\x1d\n" +
 	"\n" +
-	"stdout_url\x18\b \x01(\tR\tstdoutUrl2\xbd\x02\n" +
-	"\x12JobTemplateService\x12\\\n" +
-	"\x0eGetJobTemplate\x12(.awx.controller.v1.GetJobTemplateRequest\x1a\x1e.awx.controller.v1.JobTemplate\"\x00\x12m\n" +
-	"\x10ListJobTemplates\x12*.awx.controller.v1.ListJobTemplatesRequest\x1a+.awx.controller.v1.ListJobTemplatesResponse\"\x00\x12Z\n" +
-	"\x11LaunchJobTemplate\x12+.awx.controller.v1.LaunchJobTemplateRequest\x1a\x16.awx.controller.v1.Job\"\x00B7Z5github.com/ansible/proto-example-log-api/gen/go/awxpbb\x06proto3"
+	"stdout_url\x18\b \x01(\tR\tstdoutUrl2\xaa\x03\n" +
+	"\x12JobTemplateService\x12~\n" +
+	"\x0eGetJobTemplate\x12(.awx.controller.v1.GetJobTemplateRequest\x1a\x1e.awx.controller.v1.JobTemplate\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v2/job_templates/{id}\x12\x8a\x01\n" +
+	"\x10ListJobTemplates\x12*.awx.controller.v1.ListJobTemplatesRequest\x1a+.awx.controller.v1.ListJobTemplatesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v2/job_templates\x12\x86\x01\n" +
+	"\x11LaunchJobTemplate\x12+.awx.controller.v1.LaunchJobTemplateRequest\x1a\x16.awx.controller.v1.Job\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v2/job_templates/{id}/launchB7Z5github.com/ansible/proto-example-log-api/gen/go/awxpbb\x06proto3"
 
 var (
 	file_shared_awx_job_template_proto_rawDescOnce sync.Once

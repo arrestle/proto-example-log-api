@@ -7,6 +7,7 @@
 package gatewaypb
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -429,7 +430,7 @@ var File_shared_gateway_user_api_proto protoreflect.FileDescriptor
 
 const file_shared_gateway_user_api_proto_rawDesc = "" +
 	"\n" +
-	"\x1dshared/gateway_user_api.proto\x12\x0eaap.gateway.v1\"\xdd\x01\n" +
+	"\x1dshared/gateway_user_api.proto\x12\x0eaap.gateway.v1\x1a\x1cgoogle/api/annotations.proto\"\xdd\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -457,12 +458,12 @@ const file_shared_gateway_user_api_proto_rawDesc = "" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x1d\n" +
 	"\n" +
 	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x05 \x01(\tR\blastName2\xed\x01\n" +
-	"\vUserService\x12A\n" +
-	"\aGetUser\x12\x1e.aap.gateway.v1.GetUserRequest\x1a\x14.aap.gateway.v1.User\"\x00\x12R\n" +
-	"\tListUsers\x12 .aap.gateway.v1.ListUsersRequest\x1a!.aap.gateway.v1.ListUsersResponse\"\x00\x12G\n" +
+	"\tlast_name\x18\x05 \x01(\tR\blastName2\xcc\x02\n" +
+	"\vUserService\x12c\n" +
+	"\aGetUser\x12\x1e.aap.gateway.v1.GetUserRequest\x1a\x14.aap.gateway.v1.User\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/gateway/v1/users/{id}\x12o\n" +
+	"\tListUsers\x12 .aap.gateway.v1.ListUsersRequest\x1a!.aap.gateway.v1.ListUsersResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/gateway/v1/users\x12g\n" +
 	"\n" +
-	"CreateUser\x12!.aap.gateway.v1.CreateUserRequest\x1a\x14.aap.gateway.v1.User\"\x00B0Z.github.com/ansible/log-schema/gen/go/gatewaypbb\x06proto3"
+	"CreateUser\x12!.aap.gateway.v1.CreateUserRequest\x1a\x14.aap.gateway.v1.User\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/gateway/v1/usersB0Z.github.com/ansible/log-schema/gen/go/gatewaypbb\x06proto3"
 
 var (
 	file_shared_gateway_user_api_proto_rawDescOnce sync.Once

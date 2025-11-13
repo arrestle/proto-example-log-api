@@ -15,8 +15,183 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v2/job_templates": {
+      "get": {
+        "summary": "ListJobTemplates retrieves a paginated list of job templates.",
+        "description": "Returns only job templates the caller has permission to view based on RBAC.\nSupports filtering by name, organization, and search across multiple fields.",
+        "operationId": "JobTemplateService_ListJobTemplates",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListJobTemplatesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "description": "Page number for pagination, starting from 1.\nExample: 1",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageSize",
+            "description": "Number of results per page. Default: 25, Maximum: 200.\nExample: 25",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "name",
+            "description": "Filter by exact name match.\nExample: \"Deploy Web Servers\"",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "organizationId",
+            "description": "Filter by organization ID.\nExample: 1",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "search",
+            "description": "Search across name, description fields.\nExample: \"web\"",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderBy",
+            "description": "Order results by field. Prefix with - for descending.\nExample: \"-created\" or \"name\"",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobTemplateService"
+        ]
+      }
+    },
+    "/api/v2/job_templates/{id}": {
+      "get": {
+        "summary": "GetJobTemplate retrieves a single job template by ID.",
+        "description": "Returns the complete job template configuration including project, inventory,\nand playbook settings. Requires 'view' permission on the job template.",
+        "operationId": "JobTemplateService_GetJobTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1JobTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Job template ID to retrieve.\nExample: 7",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "JobTemplateService"
+        ]
+      }
+    },
+    "/api/v2/job_templates/{id}/launch": {
+      "post": {
+        "summary": "LaunchJobTemplate launches a job from the template.",
+        "description": "Creates a new job instance and queues it for execution. This is the primary\nway to run automation in AWX/Controller. Requires 'execute' permission.\nReturns immediately with the created job - use job status API to monitor progress.",
+        "operationId": "JobTemplateService_LaunchJobTemplate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Job"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "ID of the job template to launch.\nRequired. Example: 7",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JobTemplateServiceLaunchJobTemplateBody"
+            }
+          }
+        ],
+        "tags": [
+          "JobTemplateService"
+        ]
+      }
+    }
+  },
   "definitions": {
+    "JobTemplateServiceLaunchJobTemplateBody": {
+      "type": "object",
+      "properties": {
+        "inventoryId": {
+          "type": "integer",
+          "format": "int32",
+          "title": "Override the default inventory for this job run.\nOnly works if ask_inventory_on_launch is true.\nExample: 10"
+        },
+        "limit": {
+          "type": "string",
+          "title": "Override the limit pattern for this job run.\nOnly works if ask_limit_on_launch is true.\nExample: \"webservers:\u0026production\""
+        },
+        "extraVars": {
+          "type": "string",
+          "title": "Override extra variables for this job run.\nJSON string of variable overrides.\nExample: \"{\\\"env\\\": \\\"production\\\", \\\"debug\\\": false}\""
+        },
+        "tags": {
+          "type": "string",
+          "title": "Override tags to run"
+        },
+        "skipTags": {
+          "type": "string",
+          "title": "Override tags to skip"
+        }
+      },
+      "description": "LaunchJobTemplateRequest specifies parameters for launching a job.\n\nLaunches a new job from the template with optional runtime overrides.\nAny prompt-on-launch fields configured in the template can be overridden here."
+    },
     "protobufAny": {
       "type": "object",
       "properties": {

@@ -22,9 +22,10 @@ _runtime_version.ValidateProtobufRuntimeVersion(
 _sym_db = _symbol_database.Default()
 
 
+from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dshared/awx_job_template.proto\x12\x11\x61wx.controller.v1\"\xdf\x02\n\x0bJobTemplate\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x10\n\x08job_type\x18\x04 \x01(\t\x12\x12\n\nproject_id\x18\x05 \x01(\x05\x12\x14\n\x0cinventory_id\x18\x06 \x01(\x05\x12\x10\n\x08playbook\x18\x07 \x01(\t\x12\x17\n\x0forganization_id\x18\x08 \x01(\x05\x12\x0e\n\x06status\x18\t \x01(\t\x12\x0f\n\x07\x63reated\x18\n \x01(\t\x12\x10\n\x08modified\x18\x0b \x01(\t\x12\x11\n\tverbosity\x18\x0c \x01(\x05\x12\r\n\x05\x66orks\x18\r \x01(\x05\x12\x0f\n\x07timeout\x18\x0e \x01(\x05\x12\r\n\x05limit\x18\x0f \x01(\t\x12\x16\n\x0e\x62\x65\x63ome_enabled\x18\x10 \x01(\x08\x12\x11\n\tdiff_mode\x18\x11 \x01(\x08\x12\x1a\n\x12\x61llow_simultaneous\x18\x12 \x01(\x08\"#\n\x15GetJobTemplateRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"\x83\x01\n\x17ListJobTemplatesRequest\x12\x0c\n\x04page\x18\x01 \x01(\x05\x12\x11\n\tpage_size\x18\x02 \x01(\x05\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x17\n\x0forganization_id\x18\x04 \x01(\x05\x12\x0e\n\x06search\x18\x05 \x01(\t\x12\x10\n\x08order_by\x18\x06 \x01(\t\"z\n\x18ListJobTemplatesResponse\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\x12\x0c\n\x04next\x18\x02 \x01(\t\x12\x10\n\x08previous\x18\x03 \x01(\t\x12/\n\x07results\x18\x04 \x03(\x0b\x32\x1e.awx.controller.v1.JobTemplate\"\x80\x01\n\x18LaunchJobTemplateRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x14\n\x0cinventory_id\x18\x02 \x01(\x05\x12\r\n\x05limit\x18\x03 \x01(\t\x12\x12\n\nextra_vars\x18\x04 \x01(\t\x12\x0c\n\x04tags\x18\x05 \x01(\t\x12\x11\n\tskip_tags\x18\x06 \x01(\t\"\x90\x01\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0e\n\x06status\x18\x03 \x01(\t\x12\x17\n\x0fjob_template_id\x18\x04 \x01(\x05\x12\x0f\n\x07\x63reated\x18\x05 \x01(\t\x12\x0f\n\x07started\x18\x06 \x01(\t\x12\x10\n\x08\x66inished\x18\x07 \x01(\t\x12\x12\n\nstdout_url\x18\x08 \x01(\t2\xbd\x02\n\x12JobTemplateService\x12\\\n\x0eGetJobTemplate\x12(.awx.controller.v1.GetJobTemplateRequest\x1a\x1e.awx.controller.v1.JobTemplate\"\x00\x12m\n\x10ListJobTemplates\x12*.awx.controller.v1.ListJobTemplatesRequest\x1a+.awx.controller.v1.ListJobTemplatesResponse\"\x00\x12Z\n\x11LaunchJobTemplate\x12+.awx.controller.v1.LaunchJobTemplateRequest\x1a\x16.awx.controller.v1.Job\"\x00\x42\x37Z5github.com/ansible/proto-example-log-api/gen/go/awxpbb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1dshared/awx_job_template.proto\x12\x11\x61wx.controller.v1\x1a\x1cgoogle/api/annotations.proto\"\xdf\x02\n\x0bJobTemplate\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x03 \x01(\t\x12\x10\n\x08job_type\x18\x04 \x01(\t\x12\x12\n\nproject_id\x18\x05 \x01(\x05\x12\x14\n\x0cinventory_id\x18\x06 \x01(\x05\x12\x10\n\x08playbook\x18\x07 \x01(\t\x12\x17\n\x0forganization_id\x18\x08 \x01(\x05\x12\x0e\n\x06status\x18\t \x01(\t\x12\x0f\n\x07\x63reated\x18\n \x01(\t\x12\x10\n\x08modified\x18\x0b \x01(\t\x12\x11\n\tverbosity\x18\x0c \x01(\x05\x12\r\n\x05\x66orks\x18\r \x01(\x05\x12\x0f\n\x07timeout\x18\x0e \x01(\x05\x12\r\n\x05limit\x18\x0f \x01(\t\x12\x16\n\x0e\x62\x65\x63ome_enabled\x18\x10 \x01(\x08\x12\x11\n\tdiff_mode\x18\x11 \x01(\x08\x12\x1a\n\x12\x61llow_simultaneous\x18\x12 \x01(\x08\"#\n\x15GetJobTemplateRequest\x12\n\n\x02id\x18\x01 \x01(\x05\"\x83\x01\n\x17ListJobTemplatesRequest\x12\x0c\n\x04page\x18\x01 \x01(\x05\x12\x11\n\tpage_size\x18\x02 \x01(\x05\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x17\n\x0forganization_id\x18\x04 \x01(\x05\x12\x0e\n\x06search\x18\x05 \x01(\t\x12\x10\n\x08order_by\x18\x06 \x01(\t\"z\n\x18ListJobTemplatesResponse\x12\r\n\x05\x63ount\x18\x01 \x01(\x05\x12\x0c\n\x04next\x18\x02 \x01(\t\x12\x10\n\x08previous\x18\x03 \x01(\t\x12/\n\x07results\x18\x04 \x03(\x0b\x32\x1e.awx.controller.v1.JobTemplate\"\x80\x01\n\x18LaunchJobTemplateRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x14\n\x0cinventory_id\x18\x02 \x01(\x05\x12\r\n\x05limit\x18\x03 \x01(\t\x12\x12\n\nextra_vars\x18\x04 \x01(\t\x12\x0c\n\x04tags\x18\x05 \x01(\t\x12\x11\n\tskip_tags\x18\x06 \x01(\t\"\x90\x01\n\x03Job\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0e\n\x06status\x18\x03 \x01(\t\x12\x17\n\x0fjob_template_id\x18\x04 \x01(\x05\x12\x0f\n\x07\x63reated\x18\x05 \x01(\t\x12\x0f\n\x07started\x18\x06 \x01(\t\x12\x10\n\x08\x66inished\x18\x07 \x01(\t\x12\x12\n\nstdout_url\x18\x08 \x01(\t2\xaa\x03\n\x12JobTemplateService\x12~\n\x0eGetJobTemplate\x12(.awx.controller.v1.GetJobTemplateRequest\x1a\x1e.awx.controller.v1.JobTemplate\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v2/job_templates/{id}\x12\x8a\x01\n\x10ListJobTemplates\x12*.awx.controller.v1.ListJobTemplatesRequest\x1a+.awx.controller.v1.ListJobTemplatesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v2/job_templates\x12\x86\x01\n\x11LaunchJobTemplate\x12+.awx.controller.v1.LaunchJobTemplateRequest\x1a\x16.awx.controller.v1.Job\",\x82\xd3\xe4\x93\x02&\"!/api/v2/job_templates/{id}/launch:\x01*B7Z5github.com/ansible/proto-example-log-api/gen/go/awxpbb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,18 +33,24 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'shared.awx_job_template_pb2
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z5github.com/ansible/proto-example-log-api/gen/go/awxpb'
-  _globals['_JOBTEMPLATE']._serialized_start=53
-  _globals['_JOBTEMPLATE']._serialized_end=404
-  _globals['_GETJOBTEMPLATEREQUEST']._serialized_start=406
-  _globals['_GETJOBTEMPLATEREQUEST']._serialized_end=441
-  _globals['_LISTJOBTEMPLATESREQUEST']._serialized_start=444
-  _globals['_LISTJOBTEMPLATESREQUEST']._serialized_end=575
-  _globals['_LISTJOBTEMPLATESRESPONSE']._serialized_start=577
-  _globals['_LISTJOBTEMPLATESRESPONSE']._serialized_end=699
-  _globals['_LAUNCHJOBTEMPLATEREQUEST']._serialized_start=702
-  _globals['_LAUNCHJOBTEMPLATEREQUEST']._serialized_end=830
-  _globals['_JOB']._serialized_start=833
-  _globals['_JOB']._serialized_end=977
-  _globals['_JOBTEMPLATESERVICE']._serialized_start=980
-  _globals['_JOBTEMPLATESERVICE']._serialized_end=1297
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['GetJobTemplate']._loaded_options = None
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['GetJobTemplate']._serialized_options = b'\202\323\344\223\002\034\022\032/api/v2/job_templates/{id}'
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['ListJobTemplates']._loaded_options = None
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['ListJobTemplates']._serialized_options = b'\202\323\344\223\002\027\022\025/api/v2/job_templates'
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['LaunchJobTemplate']._loaded_options = None
+  _globals['_JOBTEMPLATESERVICE'].methods_by_name['LaunchJobTemplate']._serialized_options = b'\202\323\344\223\002&\"!/api/v2/job_templates/{id}/launch:\001*'
+  _globals['_JOBTEMPLATE']._serialized_start=83
+  _globals['_JOBTEMPLATE']._serialized_end=434
+  _globals['_GETJOBTEMPLATEREQUEST']._serialized_start=436
+  _globals['_GETJOBTEMPLATEREQUEST']._serialized_end=471
+  _globals['_LISTJOBTEMPLATESREQUEST']._serialized_start=474
+  _globals['_LISTJOBTEMPLATESREQUEST']._serialized_end=605
+  _globals['_LISTJOBTEMPLATESRESPONSE']._serialized_start=607
+  _globals['_LISTJOBTEMPLATESRESPONSE']._serialized_end=729
+  _globals['_LAUNCHJOBTEMPLATEREQUEST']._serialized_start=732
+  _globals['_LAUNCHJOBTEMPLATEREQUEST']._serialized_end=860
+  _globals['_JOB']._serialized_start=863
+  _globals['_JOB']._serialized_end=1007
+  _globals['_JOBTEMPLATESERVICE']._serialized_start=1010
+  _globals['_JOBTEMPLATESERVICE']._serialized_end=1436
 # @@protoc_insertion_point(module_scope)

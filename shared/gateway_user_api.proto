@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package aap.gateway.v1;
 
+import "google/api/annotations.proto";
+
 option go_package = "github.com/ansible/log-schema/gen/go/gatewaypb";
 
 // UserService provides operations for managing AAP Gateway users.
@@ -15,21 +17,34 @@ service UserService {
   // Returns the complete user record including username, email, and role information.
   // Requires authentication. Returns NOT_FOUND if user doesn't exist or caller
   // lacks permission to view the user.
-  rpc GetUser(GetUserRequest) returns (User) {}
+  rpc GetUser(GetUserRequest) returns (User) {
+    option (google.api.http) = {
+      get: "/api/gateway/v1/users/{id}"
+    };
+  }
   
   // ListUsers retrieves a paginated list of users with optional filtering.
   //
   // Supports filtering by username, email, and search across multiple fields.
   // Results are paginated with configurable page size. Requires authentication
   // and returns only users visible to the caller based on RBAC permissions.
-  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/gateway/v1/users"
+    };
+  }
   
   // CreateUser creates a new user account in AAP Gateway.
   //
   // Creates a new user with the specified credentials and profile information.
   // Requires superuser privileges. Username must be unique. Password must meet
   // configured complexity requirements.
-  rpc CreateUser(CreateUserRequest) returns (User) {}
+  rpc CreateUser(CreateUserRequest) returns (User) {
+    option (google.api.http) = {
+      post: "/api/gateway/v1/users"
+      body: "*"
+    };
+  }
 }
 
 // User represents an AAP Gateway user account.

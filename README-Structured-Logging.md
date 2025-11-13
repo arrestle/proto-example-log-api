@@ -27,9 +27,9 @@ Protobuf generated data structures allow us to implement JSON structured logging
 
 ## Examples
 
-- [`example/go/main.go`](example/go/main.go): Minimal Go program using the generated struct
+- [`example/go_logging/main.go`](example/go_logging/main.go): Minimal Go program using the generated struct
 - [`example/go_otlp/main.go`](example/go_otlp/main.go): OTLP Compliant Logging with embedded ansible-specific attributes.
-- [`example/py/main.py`](example/py/main.py): Minimal Python program using the generated class
+- [`example/py_logging/main.py`](example/py_logging/main.py): Minimal Python program using the generated class
 - [`example/py_google/main.py`](example/py_google/main.py): Same as above with Google MessageToDict library
 
 

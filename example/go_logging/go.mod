@@ -1,4 +1,4 @@
-module github.com/ansible/log-schema/example
+module go_logging_example
 
 go 1.24.6
 

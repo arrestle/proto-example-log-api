@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package awx.controller.v1;
 
+import "google/api/annotations.proto";
+
 option go_package = "github.com/ansible/proto-example-log-api/gen/go/awxpb";
 
 // JobTemplateService provides operations for managing AWX/Controller job templates.
@@ -14,20 +16,33 @@ service JobTemplateService {
   //
   // Returns the complete job template configuration including project, inventory,
   // and playbook settings. Requires 'view' permission on the job template.
-  rpc GetJobTemplate(GetJobTemplateRequest) returns (JobTemplate) {}
+  rpc GetJobTemplate(GetJobTemplateRequest) returns (JobTemplate) {
+    option (google.api.http) = {
+      get: "/api/v2/job_templates/{id}"
+    };
+  }
   
   // ListJobTemplates retrieves a paginated list of job templates.
   //
   // Returns only job templates the caller has permission to view based on RBAC.
   // Supports filtering by name, organization, and search across multiple fields.
-  rpc ListJobTemplates(ListJobTemplatesRequest) returns (ListJobTemplatesResponse) {}
+  rpc ListJobTemplates(ListJobTemplatesRequest) returns (ListJobTemplatesResponse) {
+    option (google.api.http) = {
+      get: "/api/v2/job_templates"
+    };
+  }
   
   // LaunchJobTemplate launches a job from the template.
   //
   // Creates a new job instance and queues it for execution. This is the primary
   // way to run automation in AWX/Controller. Requires 'execute' permission.
   // Returns immediately with the created job - use job status API to monitor progress.
-  rpc LaunchJobTemplate(LaunchJobTemplateRequest) returns (Job) {}
+  rpc LaunchJobTemplate(LaunchJobTemplateRequest) returns (Job) {
+    option (google.api.http) = {
+      post: "/api/v2/job_templates/{id}/launch"
+      body: "*"
+    };
+  }
 }
 
 // JobTemplate represents a reusable definition for running Ansible playbooks.

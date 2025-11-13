@@ -7,11 +7,15 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"example.com/protohelper"
 	awxpb "github.com/ansible/proto-example-log-api/gen/go/awxpb"
 )
 
 func main() {
 	ctx := context.Background()
+
+	// Display REST endpoints from proto annotations
+	protohelper.PrintRESTEndpoints(awxpb.File_shared_awx_job_template_proto)
 
 	// Example 1: Job Template
 	jobTemplate := &awxpb.JobTemplate{
@@ -59,14 +63,14 @@ func main() {
 
 	// Example 3: Created Job (result of launch)
 	job := &awxpb.Job{
-		Id:             42,
-		Name:           "Deploy Web Servers",
-		Status:         "pending",
-		JobTemplateId:  7,
-		Created:        "2025-11-11T14:00:00Z",
-		Started:        "",
-		Finished:       "",
-		StdoutUrl:      "/api/v2/jobs/42/stdout/",
+		Id:            42,
+		Name:          "Deploy Web Servers",
+		Status:        "pending",
+		JobTemplateId: 7,
+		Created:       "2025-11-11T14:00:00Z",
+		Started:       "",
+		Finished:      "",
+		StdoutUrl:     "/api/v2/jobs/42/stdout/",
 	}
 
 	fmt.Println("\n=== Example: Created Job (Pending Execution) ===")
@@ -101,5 +105,3 @@ func main() {
 
 	_ = ctx // satisfy linter
 }
-
-

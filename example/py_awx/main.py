@@ -8,6 +8,13 @@ sys.path.insert(0, os.path.abspath("../../gen/python"))
 from shared import awx_job_template_pb2
 
 def main():
+    print("=== REST Endpoint Mapping ===")
+    print("These proto messages map to REST endpoints via google.api.http annotations:")
+    print("  GET    /api/v2/job_templates/{id}        → GetJobTemplate")
+    print("  GET    /api/v2/job_templates             → ListJobTemplates")
+    print("  POST   /api/v2/job_templates/{id}/launch → LaunchJobTemplate")
+    print()
+
     # Example 1: Job Template
     job_template = awx_job_template_pb2.JobTemplate(
         id=7,

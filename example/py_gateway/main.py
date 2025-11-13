@@ -8,6 +8,13 @@ sys.path.insert(0, os.path.abspath("../../gen/python"))
 from shared import gateway_user_api_pb2
 
 def main():
+    print("=== REST Endpoint Mapping ===")
+    print("These proto messages map to REST endpoints via google.api.http annotations:")
+    print("  GET    /api/gateway/v1/users/{id} → GetUser")
+    print("  GET    /api/gateway/v1/users      → ListUsers")
+    print("  POST   /api/gateway/v1/users      → CreateUser")
+    print()
+
     # Example 1: Create a User
     user = gateway_user_api_pb2.User(
         id=1,

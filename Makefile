@@ -86,8 +86,12 @@ gen-go:
 gen-gateway-go:
 	@echo "🔧 Generating Go code from gateway_user_api.proto..."
 	@mkdir -p gen/go/github.com/ansible/log-schema/gen/go/gatewaypb
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
-	protoc -I. \
+	$(TOOLS_DIR)/bin/protoc \
+		-I$(PROTOC_DIR)/include \
+		-I. \
+		-Ithird_party/googleapis \
 		--go_out=gen/go \
 		--go-grpc_out=gen/go \
 		$(GATEWAY_PROTO)
@@ -108,9 +112,11 @@ gen-python:
 # Compile Gateway API proto for Python
 gen-gateway-python:
 	@echo "🔧 Generating Python code from gateway_user_api.proto..."
-	mkdir -p gen/python
+	@mkdir -p gen/python
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PYTHONPATH=$(abspath $(TOOLS_DIR))/python \
 	python -m grpc_tools.protoc -I. \
+		-Ithird_party/googleapis \
 		--python_out=gen/python \
 		--grpc_python_out=gen/python \
 		$(GATEWAY_PROTO)
@@ -118,9 +124,13 @@ gen-gateway-python:
 # Generate OpenAPI spec from Gateway API proto
 gen-gateway-openapi:
 	@echo "🔧 Generating OpenAPI 2.0 from gateway_user_api.proto..."
-	mkdir -p gen/openapi
+	@mkdir -p gen/openapi
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
-	protoc -I. \
+	$(TOOLS_DIR)/bin/protoc \
+		-I$(PROTOC_DIR)/include \
+		-I. \
+		-Ithird_party/googleapis \
 		--openapiv2_out=gen/openapi \
 		--openapiv2_opt=logtostderr=true \
 		$(GATEWAY_PROTO)
@@ -150,8 +160,12 @@ gen-gateway: gen-gateway-go gen-gateway-python gen-gateway-openapi
 gen-awx-go:
 	@echo "🔧 Generating Go code from awx_job_template.proto..."
 	@mkdir -p gen/go/github.com/ansible/proto-example-log-api/gen/go/awxpb
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
-	protoc -I. \
+	$(TOOLS_DIR)/bin/protoc \
+		-I$(PROTOC_DIR)/include \
+		-I. \
+		-Ithird_party/googleapis \
 		--go_out=gen/go \
 		--go-grpc_out=gen/go \
 		$(AWX_PROTO)
@@ -161,18 +175,25 @@ gen-awx-go:
 
 gen-awx-python:
 	@echo "🔧 Generating Python code from awx_job_template.proto..."
-	mkdir -p gen/python
+	@mkdir -p gen/python
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PYTHONPATH=$(abspath $(TOOLS_DIR))/python \
-	python -m grpc_tools.protoc -I. \
+	python -m grpc_tools.protoc \
+		-Ithird_party/googleapis \
+		-I. \
 		--python_out=gen/python \
 		--grpc_python_out=gen/python \
 		$(AWX_PROTO)
 
 gen-awx-openapi:
 	@echo "🔧 Generating OpenAPI from awx_job_template.proto..."
-	mkdir -p gen/openapi
+	@mkdir -p gen/openapi
+	@test -d third_party/googleapis || git clone --depth 1 https://github.com/googleapis/googleapis.git third_party/googleapis
 	PATH=$(abspath $(TOOLS_DIR))/bin:$$PATH \
-	protoc -I. \
+	$(TOOLS_DIR)/bin/protoc \
+		-I$(PROTOC_DIR)/include \
+		-I. \
+		-Ithird_party/googleapis \
 		--openapiv2_out=gen/openapi \
 		--openapiv2_opt=logtostderr=true \
 		$(AWX_PROTO)
@@ -196,8 +217,8 @@ convert-to-openapi3:
 
  run-go-example: go
 	@echo ""
-	@echo "--running go example"
-	cd example/go && go mod tidy && go run main.go
+	@echo "--running go logging example"
+	cd example/go_logging && go mod tidy && go run main.go
 
 
  run-otlp-example: go
@@ -209,7 +230,7 @@ convert-to-openapi3:
 	@echo ""
 	@echo "--running minimal library version"
 	PYTHONPATH=$(abspath $(TOOLS_DIR))/python:$(abspath gen/python) \
-	python3 example/py/main.py
+	python3 example/py_logging/main.py
 	@echo ""
 	@echo "--running with google library version"
 	PYTHONPATH=$(abspath $(TOOLS_DIR))/python:$(abspath gen/python) \
@@ -218,7 +239,7 @@ convert-to-openapi3:
 run-go-gateway-example:
 	@echo ""
 	@echo "--running Go gateway API example"
-	cd example/go_gateway && go mod tidy && go run main.go
+	cd example/go_gateway && GOWORK=$(abspath go.work) go mod tidy && GOWORK=$(abspath go.work) go run main.go
 
 run-py-gateway-example:
 	@echo ""
@@ -231,7 +252,7 @@ run-gateway-examples: run-go-gateway-example run-py-gateway-example
 run-go-awx-example:
 	@echo ""
 	@echo "--running Go AWX Job Template example"
-	cd example/go_awx && go mod tidy && go run main.go
+	cd example/go_awx && GOWORK=$(abspath go.work) go mod tidy && GOWORK=$(abspath go.work) go run main.go
 
 run-py-awx-example:
 	@echo ""
@@ -250,9 +271,10 @@ clean:
 	@echo "🧹 Cleaning Go caches..."
 	go clean -cache -modcache -testcache -x
 	@echo "🧹 Cleaning example go.sum files..."
-	rm -f example/go/go.sum
+	rm -f example/go_logging/go.sum
 	rm -f example/go_otlp/go.sum
 	rm -f example/go_gateway/go.sum
+	rm -f example/go_awx/go.sum
 	@echo "✓ Clean complete"
 
 
