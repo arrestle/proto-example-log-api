@@ -1,0 +1,286 @@
+openapi: 3.0.0
+info:
+  title: shared/gateway_user_api.proto
+  version: version not set
+tags:
+  - name: UserService
+paths:
+  /api/gateway/v1/users:
+    get:
+      summary: ListUsers retrieves a paginated list of users with optional filtering.
+      description: >-
+        Supports filtering by username, email, and search across multiple
+        fields.
+
+        Results are paginated with configurable page size. Requires authentication
+
+        and returns only users visible to the caller based on RBAC permissions.
+      operationId: UserService_ListUsers
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1ListUsersResponse"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      parameters:
+        - name: page
+          description: |-
+            Page number for pagination, starting from 1.
+            Example: 1 (first page), 2 (second page)
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: pageSize
+          description: |-
+            Number of results per page. Default: 25, Maximum: 200.
+            Example: 25
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: search
+          description: >-
+            Search string to filter users across username, first_name,
+            last_name, and email fields.
+
+            Case-insensitive partial matching.
+
+            Example: "alice" matches "alice", "Alice Smith", "alice@example.com"
+          in: query
+          required: false
+          schema:
+            type: string
+      tags:
+        - UserService
+    post:
+      summary: CreateUser creates a new user account in AAP Gateway.
+      description: >-
+        Creates a new user with the specified credentials and profile
+        information.
+
+        Requires superuser privileges. Username must be unique. Password must meet
+
+        configured complexity requirements.
+      operationId: UserService_CreateUser
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1User"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/v1CreateUserRequest"
+        description: CreateUserRequest specifies the required and optional fields for
+          creating a new user account.
+        required: true
+      tags:
+        - UserService
+  "/api/gateway/v1/users/{id}":
+    get:
+      summary: GetUser retrieves a single user account by their unique ID.
+      description: >-
+        Returns the complete user record including username, email, and role
+        information.
+
+        Requires authentication. Returns NOT_FOUND if user doesn't exist or caller
+
+        lacks permission to view the user.
+      operationId: UserService_GetUser
+      responses:
+        "200":
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/v1User"
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rpcStatus"
+      parameters:
+        - name: id
+          description: >-
+            Numeric user ID to retrieve. Must be a valid user ID that exists in
+            the system.
+
+            Example: 123
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      tags:
+        - UserService
+components:
+  schemas:
+    protobufAny:
+      type: object
+      properties:
+        "@type":
+          type: string
+      additionalProperties: {}
+    rpcStatus:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/protobufAny"
+    v1CreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          title: |-
+            Username for the new user. Must be unique and not already exist.
+            Required. Example: "bob"
+        password:
+          type: string
+          title: >-
+            Password for local authentication. Must meet configured complexity
+            requirements.
+
+            Required for local users. Example: "SecureP@ssw0rd123"
+        email:
+          type: string
+          title: >-
+            Email address for the user. Used for notifications and account
+            recovery.
+
+            Optional. Example: "bob@example.com"
+        firstName:
+          type: string
+          title: |-
+            First/given name for display.
+            Optional. Example: "Bob"
+        lastName:
+          type: string
+          title: |-
+            Last/family name for display.
+            Optional. Example: "Johnson"
+      description: CreateUserRequest specifies the required and optional fields for
+        creating a new user account.
+    v1ListUsersResponse:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+          title: >-
+            Total count of users matching the filter criteria (across all
+            pages).
+
+            Example: 42
+        next:
+          type: string
+          title: >-
+            URL to the next page of results, or empty string if this is the last
+            page.
+
+            Example: "/api/gateway/v1/users/?page=2"
+        previous:
+          type: string
+          title: >-
+            URL to the previous page of results, or empty string if this is the
+            first page.
+
+            Example: ""
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/v1User"
+          description: Array of User objects for the current page.
+      description: ListUsersResponse contains a paginated list of users matching the query.
+    v1User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          title: |-
+            Unique numeric identifier for the user. Auto-generated on creation.
+            Example: 123
+        username:
+          type: string
+          title: >-
+            Username for login and identification. Must be unique across all
+            users.
+
+            Typically lowercase alphanumeric with underscores or hyphens.
+
+            Example: "alice" or "bob_admin"
+        email:
+          type: string
+          title: >-
+            Email address for the user. Used for notifications and password
+            recovery.
+
+            Must be a valid email format.
+
+            Example: "alice@example.com"
+        firstName:
+          type: string
+          title: |-
+            User's first/given name for display purposes.
+            Example: "Alice"
+        lastName:
+          type: string
+          title: |-
+            User's last/family name for display purposes.
+            Example: "Smith"
+        isSuperuser:
+          type: boolean
+          title: >-
+            Whether this user has superuser privileges (all permissions).
+
+            Superusers can perform any action including user management and system configuration.
+
+            Example: false (most users), true (system administrators)
+        created:
+          type: string
+          title: |-
+            ISO 8601 timestamp when the user account was created.
+            Read-only, set automatically on creation.
+            Example: "2025-10-29T10:00:00Z"
+        modified:
+          type: string
+          title: |-
+            ISO 8601 timestamp when the user account was last modified.
+            Read-only, updated automatically on any change.
+            Example: "2025-10-29T12:30:00Z"
+      description: >-
+        User represents an AAP Gateway user account.
+
+
+        Users are the primary authentication and authorization entities in AAP.
+
+        Each user can be associated with multiple authenticators (LDAP, SAML, local, etc.)
+
+        and can be granted permissions through role-based access control (RBAC).
