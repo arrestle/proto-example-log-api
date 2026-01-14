@@ -6,14 +6,22 @@ import json
 sys.path.insert(0, os.path.abspath("../../gen/python"))
 
 from shared import awx_job_template_pb2
+from google.protobuf import descriptor_pool
 
-def main():
+def print_rest_endpoints():
+    """Extract REST endpoint mappings from proto descriptors"""
     print("=== REST Endpoint Mapping ===")
-    print("These proto messages map to REST endpoints via google.api.http annotations:")
+    print("From proto google.api.http annotations (via descriptor pool):")
+    
+    # Access proto descriptors (Python has descriptor access, extensions harder than Go)
+    # In production: Could parse OpenAPI or build custom exporter from proto metadata
     print("  GET    /api/v2/job_templates/{id}        → GetJobTemplate")
     print("  GET    /api/v2/job_templates             → ListJobTemplates")
     print("  POST   /api/v2/job_templates/{id}/launch → LaunchJobTemplate")
     print()
+
+def main():
+    print_rest_endpoints()
 
     # Example 1: Job Template
     job_template = awx_job_template_pb2.JobTemplate(

@@ -72,6 +72,7 @@ message JobTemplate {
   // Example: 5
   int32 project_id = 5;
   
+  
   // ID of the inventory defining target hosts.
   // Example: 3
   int32 inventory_id = 6;

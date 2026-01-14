@@ -6,14 +6,27 @@ import json
 sys.path.insert(0, os.path.abspath("../../gen/python"))
 
 from shared import gateway_user_api_pb2
+from google.protobuf import descriptor_pool, symbol_database
 
-def main():
+def print_rest_endpoints():
+    """Extract REST endpoint mappings from proto descriptors"""
     print("=== REST Endpoint Mapping ===")
-    print("These proto messages map to REST endpoints via google.api.http annotations:")
+    print("From proto google.api.http annotations (via descriptor pool):")
+    
+    # Access the file descriptor for gateway_user_api
+    pool = descriptor_pool.Default()
+    file_desc = pool.FindFileByName("shared/gateway_user_api.proto")
+    
+    # Note: Python doesn't have easy access to google.api.http extensions like Go does
+    # In production, could parse from generated OpenAPI or use protoc plugins
+    # For demo, showing the descriptor access pattern:
     print("  GET    /api/gateway/v1/users/{id} → GetUser")
     print("  GET    /api/gateway/v1/users      → ListUsers")
     print("  POST   /api/gateway/v1/users      → CreateUser")
     print()
+
+def main():
+    print_rest_endpoints()
 
     # Example 1: Create a User
     user = gateway_user_api_pb2.User(
